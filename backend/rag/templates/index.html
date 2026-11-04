@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RAG Chatbot DWH Jogja</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-head">
+        <h1>DWH Chat</h1>
+        <button id="newChatBtn" class="btn primary" type="button">+ Chat baru</button>
+      </div>
+      <div class="sidebar-search">
+        <input id="dashboardFilter" type="text" placeholder="Filter dashboard (opsional)" list="dashboardList" />
+        <datalist id="dashboardList"></datalist>
+      </div>
+      <div id="sessionList" class="sessions"></div>
+      <div class="sidebar-foot">
+        <div id="statsBox" class="stats">Memuat statistik…</div>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <button id="menuBtn" class="btn ghost" type="button" aria-label="Menu">☰</button>
+        <div>
+          <strong id="chatTitle">Chat baru</strong>
+          <div class="subtitle">Data dashboard DWH · jawaban memakai sitasi sumber</div>
+        </div>
+        <button id="searchModeBtn" class="btn" type="button">Mode cari</button>
+      </header>
+      <section id="searchPanel" class="search-panel hidden">
+        <form id="searchForm" class="search-form">
+          <input id="searchInput" type="text" placeholder="Cari data, mis. jumlah penduduk Sleman 2024" />
+          <button class="btn primary" type="submit">Cari</button>
+        </form>
+        <div id="searchResults" class="search-results"></div>
+      </section>
+      <section id="thread" class="thread" aria-live="polite">
+        <div class="empty" id="emptyState">
+          <h2>Mulai bertanya tentang data DWH</h2>
+          <p>Contoh: “Berapa jumlah pegawai berdasarkan pendidikan?” atau “Harga pangan apa saja yang tersedia?”</p>
+          <div class="chips" id="exampleChips"></div>
+        </div>
+      </section>
+      <form id="composer" class="composer">
+        <textarea id="messageInput" rows="2" placeholder="Tulis pertanyaan… (Enter kirim, Shift+Enter baris baru)"></textarea>
+        <button class="btn primary" type="submit" id="sendBtn">Kirim</button>
+      </form>
+      <div id="errorBar" class="error hidden"></div>
+    </main>
+  </div>
+  <script src="/static/app.js"></script>
+</body>
+</html>

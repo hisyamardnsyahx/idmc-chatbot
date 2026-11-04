@@ -1,0 +1,82 @@
+{
+  "superset": true,
+  "cctv_groups": [
+    "cctv-atcs",
+    "cctv-bantul",
+    "cctv-kominfosleman",
+    "cctv-kominfogk",
+    "cctv-kp",
+    "cctv-public",
+    "cctv-sleman",
+    "cctv-spl",
+    "cctv-sungai",
+    "cctv-uptmalioboro",
+    "cctv-kota"
+  ],
+  "cctv_portal_aliases": {
+    "cctv-kota": ["cctv.atcs-kota"]
+  },
+  "looker_sources": [
+    {
+      "id": "looker-ikm",
+      "name": "DATAKU-IKM",
+      "url": "https://lookerstudio.google.com/embed/reporting/ce80e599-db1e-4cb5-8c7e-b6bd64e9e81a/page/siyYD"
+    },
+    {
+      "id": "looker-spbe-2023",
+      "name": "Arsitektur dan Peta Rencana SPBE DIY 2023",
+      "url": "https://lookerstudio.google.com/embed/reporting/e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3/page/p_r0amzb8w1c"
+    },
+    {
+      "id": "looker-spbe-2024",
+      "name": "Arsitektur dan Peta Rencana SPBE DIY 2024",
+      "url": "https://lookerstudio.google.com/embed/reporting/ca918e9c-851d-4152-bd28-525bdfedcc17"
+    },
+    {
+      "id": "looker-spbe-2025",
+      "name": "Arsitektur dan Peta Rencana SPBE DIY 2025",
+      "url": "https://lookerstudio.google.com/embed/reporting/4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d/page/X94cD"
+    },
+    {
+      "id": "looker-jsp",
+      "name": "Masterplan Jogja Smart Province",
+      "url": "https://lookerstudio.google.com/embed/reporting/feffa0ab-1727-484e-89bd-979871799ae6/page/p_xm5zudawmd"
+    }
+  ],
+  "tableau_sources": [
+    {
+      "id": "tableau-jaringan-diy",
+      "name": "Dashboard Jaringan Fiber Optic di DIY",
+      "url": "https://public.tableau.com/views/DashboardJaringanDIY/FO?:language=en-US&:display_count=n&:origin=viz_share_link",
+      "visible_metrics": {
+        "Panjang Kabel Udara": "m",
+        "Panjang Kabel Tanam": "m",
+        "Panjang Agregat": "m"
+      }
+    }
+  ],
+  "grafana_sources": [
+    {
+      "id": "grafana-sma-yogyakarta",
+      "name": "Monitoring Media Analytics Yogyakarta",
+      "url": "https://xplore.pustakadata.id/public-dashboards/9bd0711386f5414a8d408124231d7209"
+    },
+    {
+      "id": "grafana-sma-mudik",
+      "name": "Monitoring Media Analytics Mudik Yogyakarta",
+      "url": "https://xplore.pustakadata.id/public-dashboards/dfe21823dc1e4d05b789d9a97f831c89"
+    }
+  ],
+  "web_sources": [
+    {
+      "id": "tableau-pelajar-diy",
+      "name": "Demografi Pelajar DIY",
+      "url": "https://public.tableau.com/views/DemografiAnalisisPersebaranSiswaDaerahIstimewaYogyakarta/Umum?:showVizHome=no"
+    },
+    {
+      "id": "looker-perkebunan-diy",
+      "name": "Perkebunan DIY",
+      "url": "https://lookerstudio.google.com/embed/reporting/2f568f00-d9a0-4f99-a1fe-6df3ff503927/page/p_9s7xethl8c"
+    }
+  ]
+}

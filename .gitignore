@@ -1,0 +1,71 @@
+# ============================================================================
+# Secrets and local configuration — never commit real credentials
+# ============================================================================
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+.dwh_token_cache.json
+
+# ============================================================================
+# Python
+# ============================================================================
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.coverage
+coverage.xml
+htmlcov/
+*.egg-info/
+
+# ============================================================================
+# Node / frontend build artifacts
+# ============================================================================
+node_modules/
+dist/
+dist-ssr/
+.output/
+.wxt/
+.vite/
+*.local
+logs/
+*.log
+
+# ============================================================================
+# Generated pipeline outputs (source config + templates stay committed)
+# ============================================================================
+pipeline/runtime/
+pipeline/runtime-*/
+pipeline/staging_*.json
+pipeline/ready_for_vector_db*.json
+pipeline/delta_state*.json
+pipeline/extraction_report*.json
+.ingestion.lock
+.etl-transaction*
+*.tmp
+
+# ============================================================================
+# Local-only data: vector indexes, backups and archived root-era files
+# `data/handoff/current/` is committed as a sample handoff bundle.
+# ============================================================================
+*.db
+data/backups/
+data/handoff/live-*/
+legacy/
+
+# ============================================================================
+# Agent state, OS and editor cruft
+# ============================================================================
+.superpowers/
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

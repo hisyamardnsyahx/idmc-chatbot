@@ -1,0 +1,125 @@
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { ApiError } from '../../api/client'
+import { sendChatMessage } from '../../api/chatApi'
+import { getSession } from '../../api/sessionsApi'
+import type { ChatReply, ChatSource } from '../../api/types'
+import type { ChatMessage, MessageRole } from './types'
+
+const CHAT_ERROR_MESSAGE =
+  'Maaf, terjadi kesalahan saat menghubungi server. Silakan coba lagi.'
+
+/**
+ * Owns one conversation. The session id is reused for every turn, so the
+ * backend can persist history. Closing the overlay resets the local view; the
+ * server-side session remains available from the History view.
+ */
+export function useChatSession() {
+  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [sessionId, setSessionId] = useState<string | null>(null)
+  const [isAssistantLoading, setIsAssistantLoading] = useState(false)
+  const [isHydrating, setIsHydrating] = useState(false)
+  const nextMessageId = useRef(0)
+  const requestRef = useRef<AbortController | null>(null)
+
+  const appendMessage = useCallback(
+    (role: MessageRole, text: string, status?: 'error', sources?: ChatSource[]) => {
+      const id = `m${nextMessageId.current++}`
+      setMessages((previous) => [
+        ...previous,
+        { id, role, text, status, sources },
+      ])
+    },
+    [],
+  )
+
+  const resetConversation = useCallback(() => {
+    requestRef.current?.abort()
+    requestRef.current = null
+    setIsAssistantLoading(false)
+    setIsHydrating(false)
+    setSessionId(null)
+    setMessages([])
+    nextMessageId.current = 0
+  }, [])
+
+  const sendMessage = useCallback(
+    async (value: string) => {
+      const text = value.trim()
+      // A synchronous ref guard also blocks two submits before React rerenders.
+      if (!text || requestRef.current) return
+      const controller = new AbortController()
+      requestRef.current = controller
+      appendMessage('user', text)
+      setIsAssistantLoading(true)
+
+      try {
+        let reply: ChatReply
+        try {
+          reply = await sendChatMessage(text, {
+            sessionId: sessionId ?? undefined,
+            signal: controller.signal,
+          })
+        } catch (error) {
+          // A session may have been deleted server-side. Start a fresh one
+          // instead of dead-ending the conversation.
+          if (sessionId && error instanceof ApiError && error.status === 404) {
+            setSessionId(null)
+            reply = await sendChatMessage(text, { signal: controller.signal })
+          } else {
+            throw error
+          }
+        }
+
+        if (!controller.signal.aborted) {
+          if (reply.sessionId) setSessionId(reply.sessionId)
+          appendMessage('assistant', reply.reply, undefined, reply.sources)
+        }
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          if (error instanceof Error && error.name === 'AbortError') return
+          appendMessage('assistant', CHAT_ERROR_MESSAGE, 'error')
+        }
+      } finally {
+        if (requestRef.current === controller) {
+          requestRef.current = null
+          setIsAssistantLoading(false)
+        }
+      }
+    },
+    [appendMessage, sessionId],
+  )
+
+  const loadSession = useCallback(async (id: string) => {
+    requestRef.current?.abort()
+    requestRef.current = null
+    setIsAssistantLoading(false)
+    setIsHydrating(true)
+    try {
+      const session = await getSession(id)
+      setSessionId(session.id)
+      nextMessageId.current = session.turns.length
+      setMessages(
+        session.turns.map((turn, index) => ({
+          id: `s${index}`,
+          role: turn.role,
+          text: turn.text,
+          sources: turn.role === 'assistant' && turn.sources.length > 0 ? turn.sources : undefined,
+        })),
+      )
+    } finally {
+      setIsHydrating(false)
+    }
+  }, [])
+
+  useEffect(() => () => requestRef.current?.abort(), [])
+
+  return {
+    messages,
+    sessionId,
+    isAssistantLoading,
+    isHydrating,
+    sendMessage,
+    loadSession,
+    resetConversation,
+  }
+}

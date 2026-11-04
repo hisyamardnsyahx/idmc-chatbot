@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+storage/chroma/
+storage/sessions/*.json
+storage/staging_snapshot.json
+storage/ingest_report.json
+storage/rag_index_meta.json

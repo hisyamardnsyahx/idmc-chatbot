@@ -1,0 +1,1300 @@
+{
+  "attempted": 76,
+  "carried_forward": 0,
+  "carried_forward_targets": [],
+  "chunks_produced": 507,
+  "content_changed": 74,
+  "delta_reason": "first_run",
+  "duration_s": 609.206,
+  "failed": 2,
+  "failures": [
+    {
+      "adapter": "cctv_native",
+      "category": "validation",
+      "message": "CCTV page totals changed or deduplicated count differs from meta.total",
+      "stage": "extract",
+      "target_id": "cctv_native:cctv-spl:cameras"
+    },
+    {
+      "adapter": "cctv_native",
+      "category": "validation",
+      "message": "CCTV page totals changed or deduplicated count differs from meta.total",
+      "stage": "extract",
+      "target_id": "cctv_native:cctv-kota:cameras"
+    }
+  ],
+  "failures_by_category": {
+    "validation": 2
+  },
+  "metadata_changed": 74,
+  "metadata_only": 1,
+  "portal_scope": {
+    "excluded_record_ids": [],
+    "excluded_sources": [
+      {
+        "reason": "No active portal entry (including all ancestors) or home mapping",
+        "source_dashboard_name": "Dashboard Kependudukan",
+        "source_id": "886ade99-a1b9-442b-94cd-8e2e9671c381",
+        "source_type": "superset"
+      },
+      {
+        "reason": "No active portal entry (including all ancestors) or home mapping",
+        "source_dashboard_name": "Pertanahan V2",
+        "source_id": "d8c94ab7-ab24-405c-8baa-cf6b82a17f44",
+        "source_type": "superset"
+      },
+      {
+        "reason": "No active portal entry (including all ancestors) or home mapping",
+        "source_dashboard_name": "Profil Tenaga Kesehatan",
+        "source_id": "49bb9ba6-06b7-4525-9ff7-a78e384e6854",
+        "source_type": "superset"
+      },
+      {
+        "reason": "No active portal entry (including all ancestors) or home mapping",
+        "source_dashboard_name": "Profil Rumah Sakit",
+        "source_id": "86d8feac-474a-4d74-9928-aaaf034fd1f5",
+        "source_type": "superset"
+      },
+      {
+        "reason": "No active portal entry (including all ancestors) or home mapping",
+        "source_dashboard_name": "Profil Puskesmas",
+        "source_id": "f9c8313f-5f64-4517-9720-5ee7689a50f8",
+        "source_type": "superset"
+      },
+      {
+        "reason": "No active portal entry (including all ancestors) or home mapping",
+        "source_dashboard_name": "Profil Fasilitas Puskesmas",
+        "source_id": "c333627c-1721-49c7-a6f1-c6369751bd45",
+        "source_type": "superset"
+      },
+      {
+        "reason": "No active portal entry (including all ancestors) or home mapping",
+        "source_dashboard_name": "Harga Pangan DIY",
+        "source_id": "380d5b59-7fad-4d96-9bbc-c0e8c0309e41",
+        "source_type": "superset"
+      },
+      {
+        "reason": "No active portal entry (including all ancestors) or home mapping",
+        "source_dashboard_name": "Demografi Pelajar DIY",
+        "source_id": "tableau-pelajar-diy",
+        "source_type": "tableau_looker"
+      },
+      {
+        "reason": "No active portal entry (including all ancestors) or home mapping",
+        "source_dashboard_name": "Monitoring Media Analytics Yogyakarta",
+        "source_id": "grafana-sma-yogyakarta",
+        "source_type": "grafana_public"
+      },
+      {
+        "reason": "No active portal entry (including all ancestors) or home mapping",
+        "source_dashboard_name": "Monitoring Media Analytics Mudik Yogyakarta",
+        "source_id": "grafana-sma-mudik",
+        "source_type": "grafana_public"
+      }
+    ],
+    "mapped_sources": [
+      {
+        "portal_entries": [
+          {
+            "portal_menu_name": "Beranda",
+            "portal_page_id": "home",
+            "portal_page_name": "Beranda",
+            "portal_path": [
+              "Beranda"
+            ],
+            "source": "superset:https://dwh.jogjaprov.go.id|27b5d07e-111a-449a-84a2-efc3b6cf5fa1"
+          }
+        ],
+        "source_dashboard_name": "Dashboard Pembangunan",
+        "source_id": "27b5d07e-111a-449a-84a2-efc3b6cf5fa1",
+        "source_type": "superset"
+      },
+      {
+        "portal_entries": [
+          {
+            "portal_menu_name": "Dashboard Kepegawaian",
+            "portal_page_id": "226",
+            "portal_page_name": "Dashboard Simpeg",
+            "portal_path": [
+              "Dashboard Kepegawaian",
+              "Dashboard Simpeg"
+            ],
+            "source": "superset:https://dwh.jogjaprov.go.id|b575b146-15c6-4521-906d-dcc5fa5bed1e"
+          }
+        ],
+        "source_dashboard_name": "Dashboard Simpeg (Kepegawaian)",
+        "source_id": "b575b146-15c6-4521-906d-dcc5fa5bed1e",
+        "source_type": "superset"
+      },
+      {
+        "portal_entries": [
+          {
+            "portal_menu_name": "Dashboard Koperasi & UKM",
+            "portal_page_id": "185",
+            "portal_page_name": "UMKM Marketplace",
+            "portal_path": [
+              "Dashboard Koperasi & UKM",
+              "UMKM Marketplace"
+            ],
+            "source": "superset:https://dwh.jogjaprov.go.id|6d816cf9-91b5-4711-9b77-6ee93aa7bcca"
+          }
+        ],
+        "source_dashboard_name": "UMKM Marketplace",
+        "source_id": "6d816cf9-91b5-4711-9b77-6ee93aa7bcca",
+        "source_type": "superset"
+      },
+      {
+        "portal_entries": [
+          {
+            "portal_menu_name": "Dashboard Surveillance",
+            "portal_page_id": "207",
+            "portal_page_name": "Dashboard CCTV",
+            "portal_path": [
+              "Dashboard Surveillance",
+              "Dashboard CCTV"
+            ],
+            "source": "superset:https://dwh.jogjaprov.go.id|e5f3e11f-f456-4729-aa68-53e53c1e459e"
+          }
+        ],
+        "source_dashboard_name": "Dashboard CCTV (Surveillance)",
+        "source_id": "e5f3e11f-f456-4729-aa68-53e53c1e459e",
+        "source_type": "superset"
+      },
+      {
+        "portal_entries": [
+          {
+            "portal_menu_name": "Dashboard Surveillance",
+            "portal_page_id": "23",
+            "portal_page_name": "cctv atcs",
+            "portal_path": [
+              "Dashboard Surveillance",
+              "cctv atcs"
+            ],
+            "source": "cctv.atcs"
+          }
+        ],
+        "source_dashboard_name": "cctv-atcs",
+        "source_id": "cctv-atcs",
+        "source_type": "cctv_native"
+      },
+      {
+        "portal_entries": [
+          {
+            "portal_menu_name": "Dashboard Surveillance",
+            "portal_page_id": "25",
+            "portal_page_name": "cctv bantul",
+            "portal_path": [
+              "Dashboard Surveillance",
+              "cctv bantul"
+            ],
+            "source": "cctv.bantul"
+          }
+        ],
+        "source_dashboard_name": "cctv-bantul",
+        "source_id": "cctv-bantul",
+        "source_type": "cctv_native"
+      },
+      {
+        "portal_entries": [
+          {
+            "portal_menu_name": "Dashboard Surveillance",
+            "portal_page_id": "31",
+            "portal_page_name": "cctv kominfo sleman",
+            "portal_path": [
+              "Dashboard Surveillance",
+              "cctv kominfo sleman"
+            ],
+            "source": "cctv.kominfosleman"
+          }
+        ],
+        "source_dashboard_name": "cctv-kominfosleman",
+        "source_id": "cctv-kominfosleman",
+        "source_type": "cctv_native"
+      },
+      {
+        "portal_entries": [
+          {
+            "portal_menu_name": "Dashboard Surveillance",
+            "portal_page_id": "202",
+            "portal_page_name": "cctv kominfogk",
+            "portal_path": [
+              "Dashboard Surveillance",
+              "cctv kominfogk"
+            ],
+            "source": "cctv.kominfogk"
+          }
+        ],
+        "source_dashboard_name": "cctv-kominfogk",
+        "source_id": "cctv-kominfogk",
+        "source_type": "cctv_native"
+      },
+      {
+        "portal_entries": [
+          {
+            "portal_menu_name": "Dashboard Surveillance",
+            "portal_page_id": "26",
+            "portal_page_name": "cctv kp",
+            "portal_path": [
+              "Dashboard Surveillance",
+              "cctv kp"
+            ],
+            "source": "cctv.kp"
+          }
+        ],
+        "source_dashboard_name": "cctv-kp",
+        "source_id": "cctv-kp",
+        "source_type": "cctv_native"
+      },
+      {
+        "portal_entries": [
+          {
+            "portal_menu_name": "Dashboard Surveillance",
+            "portal_page_id": "27",
+            "portal_page_name": "cctv public",
+            "portal_path": [
+              "Dashboard Surveillance",
+              "cctv public"
+            ],
+            "source": "cctv.public"
+          }
+        ],
+        "source_dashboard_name": "cctv-public",
+        "source_id": "cctv-public",
+        "source_type": "cctv_native"
+      },
+      {
+        "portal_entries": [
+          {
+            "portal_menu_name": "Dashboard Surveillance",
+            "portal_page_id": "28",
+            "portal_page_name": "cctv sleman",
+            "portal_path": [
+              "Dashboard Surveillance",
+              "cctv sleman"
+            ],
+            "source": "cctv.sleman"
+          }
+        ],
+        "source_dashboard_name": "cctv-sleman",
+        "source_id": "cctv-sleman",
+        "source_type": "cctv_native"
+      },
+      {
+        "portal_entries": [
+          {
+            "portal_menu_name": "Dashboard Surveillance",
+            "portal_page_id": "201",
+            "portal_page_name": "cctv spl",
+            "portal_path": [
+              "Dashboard Surveillance",
+              "cctv spl"
+            ],
+            "source": "cctv.spl"
+          }
+        ],
+        "source_dashboard_name": "cctv-spl",
+        "source_id": "cctv-spl",
+        "source_type": "cctv_native"
+      },
+      {
+        "portal_entries": [
+          {
+            "portal_menu_name": "Dashboard Surveillance",
+            "portal_page_id": "29",
+            "portal_page_name": "cctv sungai",
+            "portal_path": [
+              "Dashboard Surveillance",
+              "cctv sungai"
+            ],
+            "source": "cctv.sungai"
+          }
+        ],
+        "source_dashboard_name": "cctv-sungai",
+        "source_id": "cctv-sungai",
+        "source_type": "cctv_native"
+      },
+      {
+        "portal_entries": [
+          {
+            "portal_menu_name": "Dashboard Surveillance",
+            "portal_page_id": "30",
+            "portal_page_name": "cctv uptmalioboro",
+            "portal_path": [
+              "Dashboard Surveillance",
+              "cctv uptmalioboro"
+            ],
+            "source": "cctv.uptmalioboro"
+          }
+        ],
+        "source_dashboard_name": "cctv-uptmalioboro",
+        "source_id": "cctv-uptmalioboro",
+        "source_type": "cctv_native"
+      },
+      {
+        "portal_entries": [
+          {
+            "portal_menu_name": "Dashboard Surveillance",
+            "portal_page_id": "24",
+            "portal_page_name": "cctv kota",
+            "portal_path": [
+              "Dashboard Surveillance",
+              "cctv kota"
+            ],
+            "source": "cctv.atcs-kota"
+          }
+        ],
+        "source_dashboard_name": "cctv-kota",
+        "source_id": "cctv-kota",
+        "source_type": "cctv_native"
+      },
+      {
+        "portal_entries": [
+          {
+            "portal_menu_name": "Dashboard IKM dan Perkebunan",
+            "portal_page_id": "164",
+            "portal_page_name": "Perkebunan",
+            "portal_path": [
+              "Dashboard IKM dan Perkebunan",
+              "Perkebunan"
+            ],
+            "source": "https://lookerstudio.google.com/embed/reporting/2f568f00-d9a0-4f99-a1fe-6df3ff503927/page/p_9s7xethl8c"
+          }
+        ],
+        "source_dashboard_name": "Perkebunan DIY",
+        "source_id": "looker-perkebunan-diy",
+        "source_type": "tableau_looker"
+      },
+      {
+        "portal_entries": [
+          {
+            "portal_menu_name": "Dashboard IKM dan Perkebunan",
+            "portal_page_id": "165",
+            "portal_page_name": "IKM",
+            "portal_path": [
+              "Dashboard IKM dan Perkebunan",
+              "IKM"
+            ],
+            "source": "https://lookerstudio.google.com/embed/reporting/ce80e599-db1e-4cb5-8c7e-b6bd64e9e81a/page/siyYD"
+          }
+        ],
+        "source_dashboard_name": "DATAKU-IKM",
+        "source_id": "looker-ikm",
+        "source_type": "looker_studio"
+      },
+      {
+        "portal_entries": [
+          {
+            "portal_menu_name": "Manajemen SPBE",
+            "portal_page_id": "187",
+            "portal_page_name": "Arsitektur dan Peta Rencana SPBE 2023",
+            "portal_path": [
+              "Manajemen SPBE",
+              "Arsitektur dan Peta Rencana SPBE 2023"
+            ],
+            "source": "https://lookerstudio.google.com/embed/reporting/e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3/page/p_r0amzb8w1c"
+          }
+        ],
+        "source_dashboard_name": "Arsitektur dan Peta Rencana SPBE DIY 2023",
+        "source_id": "looker-spbe-2023",
+        "source_type": "looker_studio"
+      },
+      {
+        "portal_entries": [
+          {
+            "portal_menu_name": "Manajemen SPBE",
+            "portal_page_id": "194",
+            "portal_page_name": "ARSITEKTUR SPBE DIY - 2024",
+            "portal_path": [
+              "Manajemen SPBE",
+              "ARSITEKTUR SPBE DIY - 2024"
+            ],
+            "source": "https://lookerstudio.google.com/embed/reporting/ca918e9c-851d-4152-bd28-525bdfedcc17"
+          }
+        ],
+        "source_dashboard_name": "Arsitektur dan Peta Rencana SPBE DIY 2024",
+        "source_id": "looker-spbe-2024",
+        "source_type": "looker_studio"
+      },
+      {
+        "portal_entries": [
+          {
+            "portal_menu_name": "Manajemen SPBE",
+            "portal_page_id": "200",
+            "portal_page_name": "Arsitektur SPBE DIY 2025",
+            "portal_path": [
+              "Manajemen SPBE",
+              "Arsitektur SPBE DIY 2025"
+            ],
+            "source": "https://lookerstudio.google.com/embed/reporting/4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d/page/X94cD"
+          }
+        ],
+        "source_dashboard_name": "Arsitektur dan Peta Rencana SPBE DIY 2025",
+        "source_id": "looker-spbe-2025",
+        "source_type": "looker_studio"
+      },
+      {
+        "portal_entries": [
+          {
+            "portal_menu_name": "Dashboard JSP",
+            "portal_page_id": "173",
+            "portal_page_name": "Masterplan Jogja Smart Province",
+            "portal_path": [
+              "Dashboard JSP",
+              "Masterplan Jogja Smart Province"
+            ],
+            "source": "https://lookerstudio.google.com/embed/reporting/feffa0ab-1727-484e-89bd-979871799ae6/page/p_xm5zudawmd"
+          }
+        ],
+        "source_dashboard_name": "Masterplan Jogja Smart Province",
+        "source_id": "looker-jsp",
+        "source_type": "looker_studio"
+      },
+      {
+        "portal_entries": [
+          {
+            "portal_menu_name": "Dashboard Ajimandaya",
+            "portal_page_id": "171",
+            "portal_page_name": "Jaringan di DIY",
+            "portal_path": [
+              "Dashboard Ajimandaya",
+              "Jaringan di DIY"
+            ],
+            "source": "https://public.tableau.com/views/DashboardJaringanDIY/FO?:language=en-US&:display_count=n&:origin=viz_share_link"
+          }
+        ],
+        "source_dashboard_name": "Dashboard Jaringan Fiber Optic di DIY",
+        "source_id": "tableau-jaringan-diy",
+        "source_type": "tableau_public"
+      }
+    ],
+    "menu_api_url": "https://idmc.jogjaprov.go.id/backend/api/v1/menus",
+    "previous_records_excluded": 0,
+    "scope_version": 2,
+    "site_config_url": "https://idmc.jogjaprov.go.id/backend/api/v1/config",
+    "status": "verified",
+    "unmapped_visible_entries": [
+      {
+        "portal_menu_name": "Dashboard Pangan",
+        "portal_page_id": "81",
+        "portal_page_name": "Harga Pangan DIY",
+        "portal_path": [
+          "Dashboard Pangan",
+          "Harga Pangan DIY"
+        ],
+        "source": "superset:https://dwh.jogjaprov.go.id|d2af7c49-eb3d-43ee-b111-442abcd55462"
+      }
+    ],
+    "visible_entries": [
+      {
+        "portal_menu_name": "Beranda",
+        "portal_page_id": "home",
+        "portal_page_name": "Beranda",
+        "portal_path": [
+          "Beranda"
+        ],
+        "source": "superset:https://dwh.jogjaprov.go.id|27b5d07e-111a-449a-84a2-efc3b6cf5fa1"
+      },
+      {
+        "portal_menu_name": "Dashboard Ajimandaya",
+        "portal_page_id": "171",
+        "portal_page_name": "Jaringan di DIY",
+        "portal_path": [
+          "Dashboard Ajimandaya",
+          "Jaringan di DIY"
+        ],
+        "source": "https://public.tableau.com/views/DashboardJaringanDIY/FO?:language=en-US&:display_count=n&:origin=viz_share_link"
+      },
+      {
+        "portal_menu_name": "Dashboard IKM dan Perkebunan",
+        "portal_page_id": "165",
+        "portal_page_name": "IKM",
+        "portal_path": [
+          "Dashboard IKM dan Perkebunan",
+          "IKM"
+        ],
+        "source": "https://lookerstudio.google.com/embed/reporting/ce80e599-db1e-4cb5-8c7e-b6bd64e9e81a/page/siyYD"
+      },
+      {
+        "portal_menu_name": "Dashboard IKM dan Perkebunan",
+        "portal_page_id": "164",
+        "portal_page_name": "Perkebunan",
+        "portal_path": [
+          "Dashboard IKM dan Perkebunan",
+          "Perkebunan"
+        ],
+        "source": "https://lookerstudio.google.com/embed/reporting/2f568f00-d9a0-4f99-a1fe-6df3ff503927/page/p_9s7xethl8c"
+      },
+      {
+        "portal_menu_name": "Dashboard JSP",
+        "portal_page_id": "173",
+        "portal_page_name": "Masterplan Jogja Smart Province",
+        "portal_path": [
+          "Dashboard JSP",
+          "Masterplan Jogja Smart Province"
+        ],
+        "source": "https://lookerstudio.google.com/embed/reporting/feffa0ab-1727-484e-89bd-979871799ae6/page/p_xm5zudawmd"
+      },
+      {
+        "portal_menu_name": "Dashboard Kepegawaian",
+        "portal_page_id": "226",
+        "portal_page_name": "Dashboard Simpeg",
+        "portal_path": [
+          "Dashboard Kepegawaian",
+          "Dashboard Simpeg"
+        ],
+        "source": "superset:https://dwh.jogjaprov.go.id|b575b146-15c6-4521-906d-dcc5fa5bed1e"
+      },
+      {
+        "portal_menu_name": "Dashboard Koperasi & UKM",
+        "portal_page_id": "185",
+        "portal_page_name": "UMKM Marketplace",
+        "portal_path": [
+          "Dashboard Koperasi & UKM",
+          "UMKM Marketplace"
+        ],
+        "source": "superset:https://dwh.jogjaprov.go.id|6d816cf9-91b5-4711-9b77-6ee93aa7bcca"
+      },
+      {
+        "portal_menu_name": "Dashboard Pangan",
+        "portal_page_id": "81",
+        "portal_page_name": "Harga Pangan DIY",
+        "portal_path": [
+          "Dashboard Pangan",
+          "Harga Pangan DIY"
+        ],
+        "source": "superset:https://dwh.jogjaprov.go.id|d2af7c49-eb3d-43ee-b111-442abcd55462"
+      },
+      {
+        "portal_menu_name": "Dashboard Surveillance",
+        "portal_page_id": "207",
+        "portal_page_name": "Dashboard CCTV",
+        "portal_path": [
+          "Dashboard Surveillance",
+          "Dashboard CCTV"
+        ],
+        "source": "superset:https://dwh.jogjaprov.go.id|e5f3e11f-f456-4729-aa68-53e53c1e459e"
+      },
+      {
+        "portal_menu_name": "Dashboard Surveillance",
+        "portal_page_id": "23",
+        "portal_page_name": "cctv atcs",
+        "portal_path": [
+          "Dashboard Surveillance",
+          "cctv atcs"
+        ],
+        "source": "cctv.atcs"
+      },
+      {
+        "portal_menu_name": "Dashboard Surveillance",
+        "portal_page_id": "25",
+        "portal_page_name": "cctv bantul",
+        "portal_path": [
+          "Dashboard Surveillance",
+          "cctv bantul"
+        ],
+        "source": "cctv.bantul"
+      },
+      {
+        "portal_menu_name": "Dashboard Surveillance",
+        "portal_page_id": "31",
+        "portal_page_name": "cctv kominfo sleman",
+        "portal_path": [
+          "Dashboard Surveillance",
+          "cctv kominfo sleman"
+        ],
+        "source": "cctv.kominfosleman"
+      },
+      {
+        "portal_menu_name": "Dashboard Surveillance",
+        "portal_page_id": "202",
+        "portal_page_name": "cctv kominfogk",
+        "portal_path": [
+          "Dashboard Surveillance",
+          "cctv kominfogk"
+        ],
+        "source": "cctv.kominfogk"
+      },
+      {
+        "portal_menu_name": "Dashboard Surveillance",
+        "portal_page_id": "24",
+        "portal_page_name": "cctv kota",
+        "portal_path": [
+          "Dashboard Surveillance",
+          "cctv kota"
+        ],
+        "source": "cctv.atcs-kota"
+      },
+      {
+        "portal_menu_name": "Dashboard Surveillance",
+        "portal_page_id": "26",
+        "portal_page_name": "cctv kp",
+        "portal_path": [
+          "Dashboard Surveillance",
+          "cctv kp"
+        ],
+        "source": "cctv.kp"
+      },
+      {
+        "portal_menu_name": "Dashboard Surveillance",
+        "portal_page_id": "27",
+        "portal_page_name": "cctv public",
+        "portal_path": [
+          "Dashboard Surveillance",
+          "cctv public"
+        ],
+        "source": "cctv.public"
+      },
+      {
+        "portal_menu_name": "Dashboard Surveillance",
+        "portal_page_id": "28",
+        "portal_page_name": "cctv sleman",
+        "portal_path": [
+          "Dashboard Surveillance",
+          "cctv sleman"
+        ],
+        "source": "cctv.sleman"
+      },
+      {
+        "portal_menu_name": "Dashboard Surveillance",
+        "portal_page_id": "201",
+        "portal_page_name": "cctv spl",
+        "portal_path": [
+          "Dashboard Surveillance",
+          "cctv spl"
+        ],
+        "source": "cctv.spl"
+      },
+      {
+        "portal_menu_name": "Dashboard Surveillance",
+        "portal_page_id": "29",
+        "portal_page_name": "cctv sungai",
+        "portal_path": [
+          "Dashboard Surveillance",
+          "cctv sungai"
+        ],
+        "source": "cctv.sungai"
+      },
+      {
+        "portal_menu_name": "Dashboard Surveillance",
+        "portal_page_id": "30",
+        "portal_page_name": "cctv uptmalioboro",
+        "portal_path": [
+          "Dashboard Surveillance",
+          "cctv uptmalioboro"
+        ],
+        "source": "cctv.uptmalioboro"
+      },
+      {
+        "portal_menu_name": "Manajemen SPBE",
+        "portal_page_id": "194",
+        "portal_page_name": "ARSITEKTUR SPBE DIY - 2024",
+        "portal_path": [
+          "Manajemen SPBE",
+          "ARSITEKTUR SPBE DIY - 2024"
+        ],
+        "source": "https://lookerstudio.google.com/embed/reporting/ca918e9c-851d-4152-bd28-525bdfedcc17"
+      },
+      {
+        "portal_menu_name": "Manajemen SPBE",
+        "portal_page_id": "200",
+        "portal_page_name": "Arsitektur SPBE DIY 2025",
+        "portal_path": [
+          "Manajemen SPBE",
+          "Arsitektur SPBE DIY 2025"
+        ],
+        "source": "https://lookerstudio.google.com/embed/reporting/4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d/page/X94cD"
+      },
+      {
+        "portal_menu_name": "Manajemen SPBE",
+        "portal_page_id": "187",
+        "portal_page_name": "Arsitektur dan Peta Rencana SPBE 2023",
+        "portal_path": [
+          "Manajemen SPBE",
+          "Arsitektur dan Peta Rencana SPBE 2023"
+        ],
+        "source": "https://lookerstudio.google.com/embed/reporting/e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3/page/p_r0amzb8w1c"
+      }
+    ],
+    "visible_menu_names": [
+      "Dashboard Ajimandaya",
+      "Dashboard IKM dan Perkebunan",
+      "Dashboard JSP",
+      "Dashboard Kepegawaian",
+      "Dashboard Koperasi & UKM",
+      "Dashboard Pangan",
+      "Dashboard Surveillance",
+      "Manajemen SPBE"
+    ]
+  },
+  "records_produced": 74,
+  "regenerate": true,
+  "skipped": 140,
+  "skipped_targets": [
+    {
+      "reason": "known timeout",
+      "target_id": "superset:6d816cf9-91b5-4711-9b77-6ee93aa7bcca:1038"
+    },
+    {
+      "reason": "known timeout",
+      "target_id": "superset:6d816cf9-91b5-4711-9b77-6ee93aa7bcca:1115"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-079lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-179lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-279lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-579lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-679lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-779lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-979lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-a7zfg1ew7c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-a89lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-c89lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-d89lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-e2k1zxew7c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-g89lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-h0amzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-h89lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-i0amzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-i89lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-k0amzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-l0amzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-l89lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-m89lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-n89lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-o0amzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-pf9lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-q0amzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-qf9lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-rf9lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-rg3s50ew7c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-s8xe2zew7c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-sf9lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-t79lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-u79lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-uf9lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-v79lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-vf9lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-w79lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-wf9lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-x79lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-xf9lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-y79lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-yf9lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:e71730f5-9086-4f2f-aa9d-e3d57ff7b4d3:p_r0amzb8w1c/cd-z79lzb8w1c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:ca918e9c-851d-4152-bd28-525bdfedcc17:landing/cd-1meuok3zkd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:ca918e9c-851d-4152-bd28-525bdfedcc17:landing/cd-2qzng0e09c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:ca918e9c-851d-4152-bd28-525bdfedcc17:landing/cd-4tr3a1ybld"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:ca918e9c-851d-4152-bd28-525bdfedcc17:landing/cd-5i0ng0e09c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:ca918e9c-851d-4152-bd28-525bdfedcc17:landing/cd-6kmm43h09c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:ca918e9c-851d-4152-bd28-525bdfedcc17:landing/cd-7ewlwcy4ad"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:ca918e9c-851d-4152-bd28-525bdfedcc17:landing/cd-7f9jc0e5ad"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:ca918e9c-851d-4152-bd28-525bdfedcc17:landing/cd-8p5tm0zykd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:ca918e9c-851d-4152-bd28-525bdfedcc17:landing/cd-95hq6by4ad"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:ca918e9c-851d-4152-bd28-525bdfedcc17:landing/cd-alrtgzh09c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:ca918e9c-851d-4152-bd28-525bdfedcc17:landing/cd-arzng0e09c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:ca918e9c-851d-4152-bd28-525bdfedcc17:landing/cd-cnbpg1d09c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:ca918e9c-851d-4152-bd28-525bdfedcc17:landing/cd-erh10zxgad"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:ca918e9c-851d-4152-bd28-525bdfedcc17:landing/cd-fpegjjxgad"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:ca918e9c-851d-4152-bd28-525bdfedcc17:landing/cd-g3f7psjjid"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:ca918e9c-851d-4152-bd28-525bdfedcc17:landing/cd-ghahkzybld"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:ca918e9c-851d-4152-bd28-525bdfedcc17:landing/cd-i8yckuybld"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:ca918e9c-851d-4152-bd28-525bdfedcc17:landing/cd-k3179vtgad"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:ca918e9c-851d-4152-bd28-525bdfedcc17:landing/cd-pbl20yoqgd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:ca918e9c-851d-4152-bd28-525bdfedcc17:landing/cd-pe74ul5gad"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:ca918e9c-851d-4152-bd28-525bdfedcc17:landing/cd-qcdjy6e09c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:ca918e9c-851d-4152-bd28-525bdfedcc17:landing/cd-sbvvi9d09c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:ca918e9c-851d-4152-bd28-525bdfedcc17:landing/cd-t67ip0oqgd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:ca918e9c-851d-4152-bd28-525bdfedcc17:landing/cd-uybpgafbbd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:ca918e9c-851d-4152-bd28-525bdfedcc17:landing/cd-venxh0oqgd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:ca918e9c-851d-4152-bd28-525bdfedcc17:landing/cd-wwk8gvshid"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:ca918e9c-851d-4152-bd28-525bdfedcc17:landing/cd-x64fkgf09c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:ca918e9c-851d-4152-bd28-525bdfedcc17:landing/cd-xh247zoqgd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:ca918e9c-851d-4152-bd28-525bdfedcc17:landing/cd-z0c8cjy4ad"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d:X94cD/cd-1wobl5fbsd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d:X94cD/cd-2qzng0e09c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d:X94cD/cd-5i0ng0e09c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d:X94cD/cd-6kmm43h09c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d:X94cD/cd-7ewlwcy4ad"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d:X94cD/cd-7f9jc0e5ad"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d:X94cD/cd-92jvzpvrxd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d:X94cD/cd-95hq6by4ad"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d:X94cD/cd-alrtgzh09c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d:X94cD/cd-arzng0e09c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d:X94cD/cd-bbnyqmjasd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d:X94cD/cd-citfk42bld"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d:X94cD/cd-ckwr6lhasd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d:X94cD/cd-erh10zxgad"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d:X94cD/cd-fpegjjxgad"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d:X94cD/cd-g3f7psjjid"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d:X94cD/cd-gbnyqmjasd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d:X94cD/cd-hbnyqmjasd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d:X94cD/cd-ibnyqmjasd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d:X94cD/cd-k3179vtgad"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d:X94cD/cd-nbnyqmjasd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d:X94cD/cd-pe74ul5gad"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d:X94cD/cd-qcdjy6e09c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d:X94cD/cd-uybpgafbbd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d:X94cD/cd-vk70p72bld"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d:X94cD/cd-wwk8gvshid"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d:X94cD/cd-x64fkgf09c"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d:X94cD/cd-z0c8cjy4ad"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:4cfe1526-1ac6-403b-8bfd-dcdbdf15c78d:X94cD/cd-zwobl5fbsd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-0rszouohzd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-1rszouohzd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-2i4nqnzkzd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-2rszouohzd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-36dj27qizd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-3rszouohzd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-4rszouohzd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-5e7rgcpizd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-5rszouohzd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-bsszouohzd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-cg6pgypizd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-csszouohzd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-dsszouohzd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-esszouohzd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-msszouohzd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-osszouohzd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-oy1so3gpzd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-pzrzouohzd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-qrszouohzd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-qsszouohzd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-qzrzouohzd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-rzrzouohzd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-srszouohzd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-ssszouohzd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-trszouohzd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-twjqcvpizd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-urszouohzd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-vrszouohzd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-vzrzouohzd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-wrszouohzd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-wzrzouohzd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-xrszouohzd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-xzrzouohzd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-yds7i5oizd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-yrszouohzd"
+    },
+    {
+      "reason": "unsupported: Looker chart has no supported structured table representation",
+      "target_id": "looker_studio:feffa0ab-1727-484e-89bd-979871799ae6:p_xm5zudawmd/cd-zrszouohzd"
+    },
+    {
+      "reason": "unsupported: Tableau worksheet data export is not enabled for this source; only published visible metric cards are supported",
+      "target_id": "tableau_public:DashboardJaringanDIY:FO/worksheet/Sheet%201%20%283%29"
+    },
+    {
+      "reason": "unsupported: Tableau worksheet data export is not enabled for this source; only published visible metric cards are supported",
+      "target_id": "tableau_public:DashboardJaringanDIY:FO/worksheet/Sheet%2011"
+    }
+  ],
+  "started_at": "2026-10-22T04:04:40+00:00",
+  "status": "partial",
+  "succeeded": 74,
+  "success_ratio": 0.9736842105263158,
+  "targets_discovered": 216,
+  "unavailable_targets": 0
+}

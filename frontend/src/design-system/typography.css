@@ -1,0 +1,27 @@
+/*
+ * IDMC Chatbot typography tokens.
+ *
+ * Source: Figma "Frontend Dev IDMC Chatbot" > Design System > Typography (node 1:4035).
+ * Family: Plus Jakarta Sans. Letter spacing is 0 for every style.
+ * Each --idmc-type-* token is a full `font` shorthand: weight size/line-height family.
+ * The font files themselves are loaded in index.html.
+ */
+:root {
+  --idmc-font-family: 'Plus Jakarta Sans', system-ui, 'Segoe UI', Roboto, sans-serif;
+
+  /* Headings (Bold, 700) */
+  --idmc-type-h1: 700 68px/102px var(--idmc-font-family);
+  --idmc-type-h2: 700 56px/84px var(--idmc-font-family);
+  --idmc-type-h3: 700 46px/69px var(--idmc-font-family);
+  --idmc-type-h4: 700 38px/57px var(--idmc-font-family);
+  --idmc-type-h5: 700 32px/48px var(--idmc-font-family);
+  --idmc-type-h6: 700 26px/39px var(--idmc-font-family);
+  --idmc-type-h7: 700 22px/33px var(--idmc-font-family);
+
+  /* Body */
+  --idmc-type-b1: 500 18px/27px var(--idmc-font-family);
+  --idmc-type-b2: 400 16px/24px var(--idmc-font-family);
+  --idmc-type-b3: 400 14px/21px var(--idmc-font-family);
+  --idmc-type-b4: 400 12px/18px var(--idmc-font-family);
+  --idmc-type-b5: 400 10px/15px var(--idmc-font-family);
+}

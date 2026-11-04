@@ -1,0 +1,23 @@
+{
+  "chunk_count": 507,
+  "files": {
+    "delta_state_v2.json": {
+      "bytes": 15656,
+      "sha256": "532ccda9a9b2bd7cfc7c14b84ab6196cd8d953ec93d228f5111f1f3bcd60037a"
+    },
+    "ready_for_vector_db_v2.json": {
+      "bytes": 2936703,
+      "sha256": "536a625d98e2b608664cead803cdd45a025a974cd25df87d9aa9c3415d423164"
+    },
+    "staging_idmc_data.json": {
+      "bytes": 1085120,
+      "sha256": "7c75aad55323ea651f97e1e7ab27aea303a0e61995a0a576791447b04df77eb1"
+    }
+  },
+  "normalization_version": "2.1.0",
+  "published_at": "2026-10-22T04:04:40+00:00",
+  "record_count": 74,
+  "schema_version": 2,
+  "status": "partial",
+  "transform_version": "2.1.0"
+}

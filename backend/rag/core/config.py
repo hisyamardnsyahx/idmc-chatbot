@@ -60,7 +60,7 @@ class Settings:
 
     default_top_k: int = 5
     max_top_k: int = 10
-    min_score: float = 0.68
+    min_score: float = 0.64
     max_chunk_chars: int = 1500
     embed_batch: int = 50
     embed_rpm: int = 90
@@ -90,9 +90,11 @@ def _get_models(name: str, default: tuple) -> tuple:
 
 
 def _get_list(name: str, default: tuple) -> tuple:
-    raw = os.environ.get(name, "")
-    if not raw.strip():
+    if name not in os.environ:
         return default
+    raw = os.environ[name].strip()
+    if not raw or raw.lower() == "none":
+        return ()
     return tuple(item.strip() for item in raw.split(",") if item.strip())
 
 
@@ -128,7 +130,7 @@ def load_settings() -> Settings:
         ).replace(" ", "_"),
         default_top_k=_get_int("RAG_TOP_K", 5),
         max_top_k=_get_int("RAG_MAX_TOP_K", 10),
-        min_score=_get_float("VECTOR_MIN_SCORE", 0.68),
+        min_score=_get_float("VECTOR_MIN_SCORE", 0.64),
         max_chunk_chars=_get_int("RAG_MAX_CHUNK_CHARS", 1500),
         embed_batch=_get_int("EMBED_BATCH", 50),
         embed_rpm=_get_int("EMBED_RPM", 90),

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -10,13 +11,21 @@ from typing import Any
 from ..core.config import Settings, settings
 from ..core.json_io import atomic_write_json, read_json
 
+SESSION_ID_RE = re.compile(r"^[a-zA-Z0-9_-]{1,64}$")
+
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
 
 def _path(cfg: Settings, session_id: str) -> Path:
-    return cfg.sessions_dir / f"{session_id}.json"
+    if not isinstance(session_id, str) or not SESSION_ID_RE.match(session_id):
+        raise ValueError(f"Invalid session id: {session_id!r}")
+    target = (cfg.sessions_dir / f"{session_id}.json").resolve()
+    base = cfg.sessions_dir.resolve()
+    if not target.is_relative_to(base):
+        raise ValueError(f"Session path escape attempt: {session_id!r}")
+    return target
 
 
 def create_session(title: str = "New chat", cfg: Settings | None = None) -> dict[str, Any]:
@@ -35,7 +44,11 @@ def create_session(title: str = "New chat", cfg: Settings | None = None) -> dict
 
 def get_session(session_id: str, cfg: Settings | None = None) -> dict[str, Any] | None:
     cfg = cfg or settings
-    data = read_json(_path(cfg, session_id))
+    try:
+        p = _path(cfg, session_id)
+    except (ValueError, TypeError):
+        return None
+    data = read_json(p)
     return data if isinstance(data, dict) else None
 
 
@@ -81,7 +94,10 @@ def append_turn(
 
 def delete_session(session_id: str, cfg: Settings | None = None) -> bool:
     cfg = cfg or settings
-    p = _path(cfg, session_id)
+    try:
+        p = _path(cfg, session_id)
+    except (ValueError, TypeError):
+        return False
     if p.exists():
         p.unlink()
         return True

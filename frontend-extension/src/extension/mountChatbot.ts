@@ -13,7 +13,7 @@ export function mountChatbot(container: HTMLElement) {
     user: { name: 'User', role: 'Pengguna' },
     suggestions: ['Dashboard Koperasi', 'Data penduduk DIY', 'Statistik pendidikan'],
     requestReply: sendExtensionChatMessage,
-    historyEnabled: false,
+    historyEnabled: true,
   }))
   return root
 }

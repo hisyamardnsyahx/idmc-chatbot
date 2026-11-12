@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field
 
 
 class SearchRequest(BaseModel):
-    query: str
+    query: str = Field(..., min_length=1, max_length=2000)
     dashboard_name: Optional[str] = None
     top_k: int = 5
 
@@ -22,6 +22,7 @@ class Source(BaseModel):
     possibly_outdated: bool = False
     relevance: float = 0.0
     content: str = ""
+    source_url: Optional[str] = None
 
 
 class SearchResponse(BaseModel):
@@ -29,8 +30,8 @@ class SearchResponse(BaseModel):
 
 
 class ChatRequest(BaseModel):
-    message: str
-    session_id: Optional[str] = None
+    message: str = Field(..., min_length=1, max_length=2000)
+    session_id: Optional[str] = Field(None, max_length=64, pattern=r"^[a-zA-Z0-9_-]+$")
     dashboard_name: Optional[str] = None
     top_k: int = 5
 

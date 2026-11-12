@@ -66,6 +66,21 @@ export function SourceList({ sources }: SourceListProps) {
               {details && (
                 <p className="[margin:0] [color:var(--idmc-color-neutral-600)]">{details}</p>
               )}
+              {source.sourceUrl && (
+                <a
+                  href={source.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={cn(
+                    'inline-flex items-center gap-1 [margin-block-start:var(--idmc-space-1)]',
+                    '[font:var(--idmc-type-b4)] [color:var(--idmc-color-primary-600)] hover:[color:var(--idmc-color-primary-700)]',
+                    'underline [font-weight:600]',
+                  )}
+                >
+                  <span>🔗 Buka di Portal IDMC</span>
+                  <span aria-hidden="true">↗</span>
+                </a>
+              )}
             </li>
           )
         })}

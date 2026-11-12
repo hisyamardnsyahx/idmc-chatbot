@@ -31,7 +31,9 @@ class FormattedReply:
 def _source_line(p: Passage) -> str:
     stale = " — mungkin basi" if p.possibly_outdated else ""
     when = f", data {p.data_as_of}" if p.data_as_of else ""
-    return f"- {p.dashboard} — {p.chart} (baris {p.rows_covered}{when}){stale}"
+    url = getattr(p, "source_url", "") or "https://idmc.jogjaprov.go.id/"
+    link = f" · [🔗 Buka di Portal IDMC]({url})" if url else ""
+    return f"- {p.dashboard} — {p.chart} (baris {p.rows_covered}{when}){stale}{link}"
 
 
 def build_sources_block(passages: list[Passage]) -> str:

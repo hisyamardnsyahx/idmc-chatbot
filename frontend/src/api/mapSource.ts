@@ -11,12 +11,13 @@ interface RawSource {
   possibly_outdated?: unknown
   relevance?: unknown
   content?: unknown
+  source_url?: unknown
 }
 
 export function mapSource(raw: unknown): ChatSource | null {
   if (typeof raw !== 'object' || raw === null) return null
   const value = raw as RawSource
-  return {
+  const source: ChatSource = {
     dashboard: typeof value.dashboard === 'string' ? value.dashboard : undefined,
     chart: typeof value.chart === 'string' ? value.chart : undefined,
     sliceId:
@@ -29,4 +30,8 @@ export function mapSource(raw: unknown): ChatSource | null {
     relevance: typeof value.relevance === 'number' ? value.relevance : 0,
     content: typeof value.content === 'string' ? value.content : '',
   }
+  if (typeof value.source_url === 'string') {
+    source.sourceUrl = value.source_url
+  }
+  return source
 }

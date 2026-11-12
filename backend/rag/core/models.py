@@ -27,6 +27,7 @@ class Passage:
     possibly_outdated: bool
     relevance: float
     content: str
+    source_url: str = ""
 
 
 @dataclass(frozen=True)

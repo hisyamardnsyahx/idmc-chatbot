@@ -42,10 +42,14 @@ def _cached_openai_client(base_url: str, api_key: str):
 
 def _cached_genai_client(api_key: str):
     from google import genai
+    from google.genai import types
 
     client = _genai_clients.get(api_key)
     if client is None:
-        client = genai.Client(api_key=api_key)
+        client = genai.Client(
+            api_key=api_key,
+            http_options=types.HttpOptions(timeout=60_000),
+        )
         _genai_clients[api_key] = client
     return client
 

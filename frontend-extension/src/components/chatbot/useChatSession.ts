@@ -129,5 +129,6 @@ export function useChatSession(requestReply: ChatTransport = sendChatMessage) {
     sendMessage,
     loadSession,
     resetConversation,
+    appendMessage,
   }
 }

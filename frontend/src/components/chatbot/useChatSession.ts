@@ -121,5 +121,6 @@ export function useChatSession() {
     sendMessage,
     loadSession,
     resetConversation,
+    appendMessage,
   }
 }

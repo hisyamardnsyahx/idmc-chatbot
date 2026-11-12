@@ -9,6 +9,7 @@ export interface ChatSource {
   possiblyOutdated: boolean
   relevance: number
   content: string
+  sourceUrl?: string
 }
 
 export interface ChatReply {

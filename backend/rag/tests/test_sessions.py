@@ -47,3 +47,12 @@ def test_append_missing_session_raises(tmp_path):
     except ValueError:
         return
     raise AssertionError("expected ValueError")
+
+
+def test_path_traversal_session_lookup_prevented(tmp_path):
+    cfg = _cfg(tmp_path)
+    traversal_input = "../../../../frontend/package"
+    data = sessions.get_session(traversal_input, cfg=cfg)
+    assert data is None
+    assert sessions.delete_session(traversal_input, cfg=cfg) is False
+

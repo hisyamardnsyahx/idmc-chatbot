@@ -9,6 +9,8 @@ No prompt text, retry logic, or chunking lives here.
 from __future__ import annotations
 
 import logging
+import os
+import re
 from pathlib import Path
 from typing import Any
 
@@ -100,6 +102,7 @@ def _passage_to_source(p) -> schemas.Source:
         possibly_outdated=p.possibly_outdated,
         relevance=p.relevance,
         content=p.content,
+        source_url=getattr(p, "source_url", "") or "https://idmc.jogjaprov.go.id/",
     )
 
 
@@ -201,12 +204,19 @@ def api_chat(req: schemas.ChatRequest) -> schemas.ChatResponse:
 
 
 @app.get("/api/sessions")
-def api_list_sessions() -> dict[str, Any]:
+def api_list_sessions(request: Request) -> dict[str, Any]:
+    expected_token = os.environ.get("SESSION_AUTH_TOKEN", "").strip()
+    if expected_token:
+        auth_header = request.headers.get("Authorization", "")
+        if not auth_header.startswith("Bearer ") or auth_header[7:].strip() != expected_token:
+            raise HTTPException(status_code=401, detail="Unauthorized")
     return {"sessions": session_store.list_sessions()}
 
 
 @app.get("/api/sessions/{session_id}", response_model=schemas.SessionDetail)
 def api_get_session(session_id: str) -> schemas.SessionDetail:
+    if not re.match(r"^[a-zA-Z0-9_-]{1,64}$", session_id):
+        raise HTTPException(status_code=400, detail="Invalid session ID format")
     s = session_store.get_session(session_id)
     if s is None:
         raise HTTPException(status_code=404, detail="session not found")
@@ -230,6 +240,8 @@ def api_get_session(session_id: str) -> schemas.SessionDetail:
 
 @app.delete("/api/sessions/{session_id}")
 def api_delete_session(session_id: str) -> dict[str, Any]:
+    if not re.match(r"^[a-zA-Z0-9_-]{1,64}$", session_id):
+        raise HTTPException(status_code=400, detail="Invalid session ID format")
     ok = session_store.delete_session(session_id)
     if not ok:
         raise HTTPException(status_code=404, detail="session not found")

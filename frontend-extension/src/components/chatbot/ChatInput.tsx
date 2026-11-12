@@ -26,8 +26,8 @@ export function ChatInput({
 }: ChatInputProps) {
   const [draft, setDraft] = useState('')
   const loadingLabelId = useId()
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
+
+  const submitDraft = () => {
     if (submitDisabled) return
     const text = draft.trim()
     if (!text) return
@@ -35,12 +35,17 @@ export function ChatInput({
     setDraft('')
   }
 
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    submitDraft()
+  }
+
   return (
     <form
       className={cn(
         `idmc-chat-input idmc-chat-input--${variant}`,
-        'flex flex-none items-center justify-end [inline-size:100%] [block-size:var(--idmc-composer-height)]',
-        '[margin:0] [padding:6px_8px] overflow-clip',
+        'flex flex-none items-end justify-end [inline-size:100%] min-h-[var(--idmc-composer-height)] max-h-32',
+        '[margin:0] [padding:6px_8px]',
         '[background:var(--idmc-color-neutral-100)]',
         '[&:focus-within]:[outline:var(--idmc-stroke-1)_solid_var(--idmc-color-primary-300)]',
         '[&:focus-within]:[outline-offset:-2px]',
@@ -51,28 +56,35 @@ export function ChatInput({
       onSubmit={handleSubmit}
       aria-busy={submitDisabled}
     >
-      <input
+      <textarea
         className={cn(
           'idmc-chat-input__field',
-          '[flex:1_1_auto] self-stretch [min-inline-size:0] [padding-inline:var(--idmc-space-5)] [border:0]',
+          '[flex:1_1_auto] [min-inline-size:0] [padding-inline:var(--idmc-space-5)] [border:0]',
           '[background:transparent] [color:var(--idmc-color-neutral-900)] [font:var(--idmc-type-b2)]',
           '[letter-spacing:0] [outline:0] [&::placeholder]:[color:var(--idmc-color-neutral-500)]',
           'narrow:[padding-inline:var(--idmc-space-3)]',
+          'resize-none leading-normal py-2 max-h-24 overflow-y-auto',
         )}
-        type="text"
+        rows={1}
         name="message"
         aria-label={label}
         aria-describedby={submitDisabled ? loadingLabelId : undefined}
         value={draft}
         onChange={(event) => setDraft(event.target.value)}
         onKeyDown={(event) => {
-          if (event.key === 'Enter' && event.nativeEvent.isComposing) event.preventDefault()
+          if (event.key === 'Enter' && event.nativeEvent.isComposing) return
+          if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault()
+            submitDraft()
+          }
         }}
         placeholder={placeholder}
         autoComplete="off"
         autoFocus={autoFocus}
       />
-      <SendButton disabled={submitDisabled || !draft.trim()} />
+      <div className="flex-none pb-1">
+        <SendButton disabled={submitDisabled || !draft.trim()} />
+      </div>
       {submitDisabled && (
         <span id={loadingLabelId} className={cn('idmc-visually-hidden', visuallyHiddenClasses)}>
           Menunggu jawaban asisten. Anda tetap dapat menulis pesan.

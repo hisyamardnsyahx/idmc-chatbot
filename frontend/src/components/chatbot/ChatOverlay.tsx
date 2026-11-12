@@ -18,6 +18,22 @@ type OverlayPhase = 'closed' | 'open' | 'closing'
 /** Safety net in case the exit animation never reports its end (hidden tab, interrupted). */
 const CLOSE_FALLBACK_MS = 300
 
+/**
+ * Inactivity trigger threshold in milliseconds.
+ * HCI (Human-Computer Interaction) benchmark for conversational agent proactive
+ * prompt is 45 seconds (avoids interrupting reading/typing while preventing abandonment).
+ */
+export const IDLE_TIMEOUT_MS = 45_000
+
+export const IDLE_NUDGE_MESSAGE =
+  'Halo! Ada yang bisa saya bantu jelajahi di Portal IDMC? 😊\n\n' +
+  'Beberapa data publik menarik yang sering dicari masyarakat DIY:\n' +
+  '- 📊 **Realisasi Belanja Pemda DIY** (informasi anggaran & target belanja)\n' +
+  '- 🏢 **Jumlah OPD & Kepegawaian** (data instansi di lingkungan DIY)\n' +
+  '- 🌐 **Infrastruktur Jaringan Fiber Optic** (panjang kabel tanam & udara)\n' +
+  '- 📹 **CCTV Publik Malioboro & Titik Wisata DIY**\n\n' +
+  'Silakan tanyakan hal yang ingin Anda ketahui seputar data Pemda DIY!'
+
 const HISTORY_ERROR =
   'Riwayat chat tidak bisa dimuat. Periksa koneksi backend lalu coba lagi.'
 const OPEN_SESSION_ERROR = 'Percakapan tidak bisa dibuka. Coba lagi.'
@@ -55,6 +71,7 @@ export function ChatOverlay({
     sendMessage,
     loadSession,
     resetConversation,
+    appendMessage,
   } = useChatSession()
   const [selectedHistoryId, setSelectedHistoryId] = useState<string | null>(null)
   const [historyItems, setHistoryItems] = useState<ChatHistoryItem[]>(historyItemsProp ?? [])
@@ -64,18 +81,22 @@ export function ChatOverlay({
   const panelRef = useRef<HTMLDivElement>(null)
   const launcherRef = useRef<HTMLButtonElement>(null)
   const wasActiveRef = useRef(false)
+  const hasNudgedRef = useRef(false)
+  const idleTimerRef = useRef<number | null>(null)
   // The view History was opened from, so Back returns to it. Written only when History opens.
   const previousViewRef = useRef<Exclude<ChatView, 'history'>>('home')
 
-  // Final step of closing: unmount the panel and reset to Home with no messages.
+  // Final step of closing: unmount the panel and preserve conversation state.
   const finishClose = useCallback(() => {
-    resetConversation()
     setPhase('closed')
-    setView('home')
     setSelectedHistoryId(null)
     setHistoryError(null)
-    previousViewRef.current = 'home'
-  }, [resetConversation])
+    hasNudgedRef.current = false
+    if (idleTimerRef.current !== null) {
+      window.clearTimeout(idleTimerRef.current)
+      idleTimerRef.current = null
+    }
+  }, [])
 
   // Start closing: play the exit animation first, or skip it for reduced motion.
   const requestClose = useCallback(() => {
@@ -83,8 +104,68 @@ export function ChatOverlay({
     else setPhase((current) => (current === 'open' ? 'closing' : current))
   }, [finishClose])
 
+  const resetIdleTimer = useCallback(() => {
+    if (idleTimerRef.current !== null) {
+      window.clearTimeout(idleTimerRef.current)
+      idleTimerRef.current = null
+    }
+
+    if (phase !== 'open' || hasNudgedRef.current || isAssistantLoading || isHydrating) {
+      return
+    }
+
+    idleTimerRef.current = window.setTimeout(() => {
+      hasNudgedRef.current = true
+      appendMessage('assistant', IDLE_NUDGE_MESSAGE)
+      setView((current) => (current === 'home' ? 'chat' : current))
+    }, IDLE_TIMEOUT_MS)
+  }, [phase, isAssistantLoading, isHydrating, appendMessage])
+
+  // Track inactivity when the panel is open
+  useEffect(() => {
+    if (phase !== 'open') {
+      if (idleTimerRef.current !== null) {
+        window.clearTimeout(idleTimerRef.current)
+        idleTimerRef.current = null
+      }
+      return
+    }
+
+    resetIdleTimer()
+
+    const handleUserActivity = () => {
+      resetIdleTimer()
+    }
+
+    const panel = panelRef.current
+    if (panel) {
+      panel.addEventListener('keydown', handleUserActivity, { passive: true })
+      panel.addEventListener('pointerdown', handleUserActivity, { passive: true })
+      panel.addEventListener('mousemove', handleUserActivity, { passive: true })
+      panel.addEventListener('touchstart', handleUserActivity, { passive: true })
+    }
+
+    return () => {
+      if (idleTimerRef.current !== null) {
+        window.clearTimeout(idleTimerRef.current)
+        idleTimerRef.current = null
+      }
+      if (panel) {
+        panel.removeEventListener('keydown', handleUserActivity)
+        panel.removeEventListener('pointerdown', handleUserActivity)
+        panel.removeEventListener('mousemove', handleUserActivity)
+        panel.removeEventListener('touchstart', handleUserActivity)
+      }
+    }
+  }, [phase, resetIdleTimer])
+
   // Home submit or suggestion click: send the text and switch to Conversation.
   const startConversation = (text: string) => {
+    hasNudgedRef.current = true
+    if (idleTimerRef.current !== null) {
+      window.clearTimeout(idleTimerRef.current)
+      idleTimerRef.current = null
+    }
     void sendMessage(text)
     setView('chat')
   }

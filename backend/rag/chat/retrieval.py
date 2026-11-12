@@ -10,7 +10,10 @@ Both shapes feed the same dashboard allow-list and chart catalogue.
 
 from __future__ import annotations
 
+import base64
+import json
 from typing import Any
+import urllib.parse
 
 from ..core import config as config_mod
 from ..core.json_io import read_json
@@ -70,8 +73,58 @@ def dashboard_names() -> list[str]:
     )
 
 
+def resolve_portal_url(metadata: dict[str, Any]) -> str:
+    """Resolve the public, login-free IDMC portal URL for the dashboard.
+    
+    Internal DWH URLs (dwh.jogjaprov.go.id) require staff authentication,
+    so we always map to the public dashboard on idmc.jogjaprov.go.id.
+    """
+    portal_entries = metadata.get("portal_entries")
+    if isinstance(portal_entries, str):
+        try:
+            portal_entries = json.loads(portal_entries)
+        except Exception:
+            portal_entries = []
+
+    if portal_entries and isinstance(portal_entries, list) and isinstance(portal_entries[0], dict):
+        entry = portal_entries[0]
+        portal_path = entry.get("portal_path") or []
+        source = entry.get("source") or ""
+
+        # Beranda is the root of the portal (Dashboard Pembangunan)
+        if portal_path == ["Beranda"] or entry.get("portal_page_id") == "home":
+            return "https://idmc.jogjaprov.go.id/"
+
+        if portal_path and source:
+            slugs = [
+                p.strip().lower()
+                .replace("&", "-")
+                .replace("  ", " ")
+                .replace(" ", "-")
+                .replace("(", "")
+                .replace(")", "")
+                .replace("/", "-")
+                for p in portal_path
+            ]
+            slugs = ["-".join(filter(None, s.split("-"))) for s in slugs]
+            encoded_source = base64.b64encode(urllib.parse.quote(source, safe="").encode("utf-8")).decode("utf-8")
+            return f"https://idmc.jogjaprov.go.id/{'/'.join(slugs)}/{encoded_source}"
+
+    d_name = (metadata.get("dashboard_name") or "").lower()
+    if "pembangunan" in d_name or "beranda" in d_name:
+        return "https://idmc.jogjaprov.go.id/"
+
+    raw_url = metadata.get("source_url") or ""
+    if raw_url.startswith("https://idmc.jogjaprov.go.id/"):
+        return raw_url
+
+    return "https://idmc.jogjaprov.go.id/"
+
+
 def _to_passage(hit: dict[str, Any]) -> Passage:
     metadata = hit.get("metadata") or {}
+    source_url = resolve_portal_url(metadata)
+
     return Passage(
         dashboard=metadata.get("dashboard_name") or "Unknown dashboard",
         chart=metadata.get("slice_name") or metadata.get("chart_name") or "Unknown chart",
@@ -88,6 +141,7 @@ def _to_passage(hit: dict[str, Any]) -> Passage:
         possibly_outdated=bool(metadata.get("stale")),
         relevance=round(float(hit.get("score", 0.0)), 3),
         content=hit.get("content") or "",
+        source_url=source_url,
     )
 
 

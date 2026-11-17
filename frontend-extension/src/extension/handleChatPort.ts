@@ -14,7 +14,11 @@ export function isPortalSender(sender: Browser.runtime.MessageSender | undefined
 export function handleChatPort(port: Browser.runtime.Port, endpoint: string) {
   const controller = new AbortController()
   let handled = false
-  port.onDisconnect.addListener(() => controller.abort())
+  port.onDisconnect.addListener(() => {
+    const chromeGlobal = (globalThis as unknown as { chrome?: { runtime?: { lastError?: { message?: string } } } }).chrome
+    void chromeGlobal?.runtime?.lastError
+    controller.abort()
+  })
   const respond = (response: ChatPortResponse) => {
     if (controller.signal.aborted) return
     try { port.postMessage(response) } catch { controller.abort() }

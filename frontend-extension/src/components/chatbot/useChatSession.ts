@@ -5,6 +5,7 @@ import type { ChatTransport } from '../../api/chatTransport'
 import { getSession } from '../../api/sessionsApi'
 import type { ChatReply, ChatSource } from '../../api/types'
 import type { ChatMessage, MessageRole } from './types'
+import { getLocalSessionDetail, saveLocalSession } from './localHistory'
 
 const CHAT_ERROR_MESSAGE =
   'Maaf, terjadi kesalahan saat menghubungi server. Silakan coba lagi.'
@@ -103,21 +104,49 @@ export function useChatSession(requestReply: ChatTransport = sendChatMessage) {
     setIsAssistantLoading(false)
     setIsHydrating(true)
     try {
-      const session = await getSession(id)
-      setSessionId(session.id)
-      nextMessageId.current = session.turns.length
-      setMessages(
-        session.turns.map((turn, index) => ({
-          id: `s${index}`,
-          role: turn.role,
-          text: turn.text,
-          sources: turn.role === 'assistant' && turn.sources.length > 0 ? turn.sources : undefined,
-        })),
-      )
+      try {
+        const session = await getSession(id)
+        setSessionId(session.id)
+        nextMessageId.current = session.turns.length
+        setMessages(
+          session.turns.map((turn, index) => ({
+            id: `s${index}`,
+            role: turn.role,
+            text: turn.text,
+            sources: turn.role === 'assistant' && turn.sources.length > 0 ? turn.sources : undefined,
+          })),
+        )
+        return
+      } catch (error) {
+        const local = getLocalSessionDetail(id)
+        if (local && local.messages.length > 0) {
+          setSessionId(local.id)
+          nextMessageId.current = local.messages.length
+          setMessages(local.messages)
+          return
+        }
+        throw error
+      }
     } finally {
       setIsHydrating(false)
     }
   }, [])
+
+  // Auto-save conversation to local storage so history works offline & in extension
+  useEffect(() => {
+    if (messages.length === 0) return
+    const sid = sessionId || 'sess_current'
+    const firstUser = messages.find((m) => m.role === 'user')
+    const title = firstUser
+      ? firstUser.text.slice(0, 36) + (firstUser.text.length > 36 ? '...' : '')
+      : 'Percakapan IDMC'
+    saveLocalSession({
+      id: sid,
+      title,
+      updatedAt: new Date().toISOString(),
+      messages,
+    })
+  }, [messages, sessionId])
 
   useEffect(() => () => requestRef.current?.abort(), [])
 

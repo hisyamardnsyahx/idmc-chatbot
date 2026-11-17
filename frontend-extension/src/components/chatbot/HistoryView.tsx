@@ -16,6 +16,8 @@ export interface HistoryViewProps {
   onClose?: () => void
   isLoading?: boolean
   error?: string | null
+  /** Action to clear all stored history sessions */
+  onClearHistory?: () => void
 }
 
 /** History state: a compact "Recents" list. An internal widget view, not a sidebar or route. */
@@ -27,6 +29,7 @@ export function HistoryView({
   onClose,
   isLoading = false,
   error = null,
+  onClearHistory,
 }: HistoryViewProps) {
   const labelId = useId()
 
@@ -53,17 +56,29 @@ export function HistoryView({
             'flex [flex:1_1_0] flex-col [min-block-size:0] [padding-block-start:var(--idmc-content-gap)]',
           )}
         >
-          <h2
-            className={cn(
-              'idmc-history__label',
-              'flex-none [margin:0] [padding:var(--idmc-space-1)_var(--idmc-space-3)]',
-              '[color:var(--idmc-color-neutral-600)] [font:var(--idmc-type-b4)] [&]:[font-weight:600]',
-              '[letter-spacing:0]',
+          <div className="flex flex-none items-center justify-between [padding:var(--idmc-space-1)_var(--idmc-space-3)]">
+            <h2
+              className={cn(
+                'idmc-history__label',
+                '[margin:0]',
+                '[color:var(--idmc-color-neutral-600)] [font:var(--idmc-type-b4)] [&]:[font-weight:600]',
+                '[letter-spacing:0]',
+              )}
+              id={labelId}
+            >
+              Recents ({items.length}/10)
+            </h2>
+            {onClearHistory && (
+              <button
+                type="button"
+                onClick={onClearHistory}
+                className="text-xs font-semibold text-[var(--idmc-color-primary-500)] hover:text-[var(--idmc-color-primary-700)] hover:underline cursor-pointer bg-transparent border-0 p-0"
+                title="Hapus semua riwayat percakapan"
+              >
+                Hapus Riwayat
+              </button>
             )}
-            id={labelId}
-          >
-            Recents
-          </h2>
+          </div>
           <ul
             className={cn(
               'idmc-history__list',

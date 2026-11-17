@@ -12,7 +12,7 @@ const render = (name, props) => renderToStaticMarkup(createElement(components[na
 before(async () => {
   // Vite compiles existing TSX/CSS; no extra test framework or DOM dependency.
   server = await createServer({ server: { middlewareMode: true }, appType: 'custom' })
-  for (const name of ['MarkdownContent', 'MessageList', 'HistoryView', 'HistoryItem', 'ChatInput', 'ChatHeader', 'SourceList']) {
+  for (const name of ['MarkdownContent', 'MessageList', 'HistoryView', 'HistoryItem', 'ChatInput', 'ChatHeader', 'SourceList', 'ConversationView']) {
     const module = await server.ssrLoadModule(`/src/components/chatbot/${name}.tsx`)
     components[name] = module[name]
   }
@@ -57,6 +57,17 @@ test('assistant Markdown renders headings, emphasis, lists, links and code', () 
   }
   assert.match(html, /target="_blank"/)
   assert.match(html, /rel="noopener noreferrer"/)
+})
+
+test('prompt links in Markdown render as interactive buttons with prompt text', () => {
+  const prompt = 'Bagaimana status indeks kualitas lingkungan hidup dan kualitas udara di DIY?'
+  const encoded = encodeURIComponent(prompt)
+  const html = render('MarkdownContent', {
+    text: `Mau tahu lebih lanjut? [Klik di sini: "${prompt}"](idmc-prompt:${encoded})`,
+  })
+  assert.match(html, /<button type="button"/)
+  assert.match(html, /Klik di sini/)
+  assert.match(html, /Bagaimana status indeks kualitas lingkungan hidup/)
 })
 
 test('GFM tables get an accessible scroll container and structured cells', () => {
@@ -310,4 +321,120 @@ test('shared header retains back/history/close labels and optional slots', () =>
   for (const label of ['Kembali', 'Riwayat chat', 'Tutup chatbot']) assert.ok(html.includes(label))
   assert.match(html, /<h1[^>]*>Riwayat Chat<\/h1>/)
   assert.doesNotMatch(render('ChatHeader', {}), /<button|<h1/)
+})
+
+test('dynamic insights pool, formatting, and non-repeating rotation queue', async () => {
+  const { DYNAMIC_INSIGHTS_POOL, formatInsightMessage } = await server.ssrLoadModule('/src/components/chatbot/insights.ts')
+  assert.equal(DYNAMIC_INSIGHTS_POOL.length, 10, 'Pool must contain 10 authentic IDMC insights')
+
+  const ids = new Set()
+  for (const item of DYNAMIC_INSIGHTS_POOL) {
+    assert.ok(item.id && typeof item.id === 'string')
+    assert.ok(item.title && typeof item.title === 'string')
+    assert.ok(item.fact && typeof item.fact === 'string')
+    assert.ok(item.suggestedPrompt && typeof item.suggestedPrompt === 'string')
+    assert.equal(ids.has(item.id), false)
+    ids.add(item.id)
+
+    const formatted = formatInsightMessage(item)
+    assert.match(formatted, /Sekilas Data DIY/)
+    assert.ok(formatted.includes(item.title))
+    assert.match(formatted, /idmc-prompt:/)
+    assert.match(formatted, /Mau tahu lebih lanjut\?/)
+    assert.doesNotMatch(formatted, /[💡👉🔄⏱️]/, 'Must contain 0 emojis')
+  }
+
+  // Verify non-repeating rotation behavior across 10 items
+  const round1 = []
+  for (let i = 0; i < 10; i++) {
+    round1.push(DYNAMIC_INSIGHTS_POOL[i].id)
+  }
+  assert.equal(new Set(round1).size, 10, 'All 10 insights in round 1 must be unique')
+})
+
+test('local history persistence, retrieval and summaries', async () => {
+  const storageMap = new Map()
+  globalThis.localStorage = {
+    getItem: (k) => storageMap.get(k) ?? null,
+    setItem: (k, v) => storageMap.set(k, String(v)),
+    removeItem: (k) => storageMap.delete(k),
+    clear: () => storageMap.clear(),
+  }
+
+  try {
+    const {
+      saveLocalSession,
+      getLocalSessions,
+      getLocalSessionSummaries,
+      getLocalSessionDetail,
+      clearLocalSessions,
+    } = await server.ssrLoadModule('/src/components/chatbot/localHistory.ts')
+
+    assert.deepEqual(getLocalSessions(), [])
+
+    saveLocalSession({
+      id: 's-101',
+      title: 'Fiber Optic Pemda',
+      updatedAt: '2026-11-12T10:00:00Z',
+      messages: [
+        { id: 'm1', role: 'user', text: 'Berapa panjang kabel FO?' },
+        { id: 'm2', role: 'assistant', text: 'Total kabel puluhan kilometer.' },
+      ],
+    })
+
+    const summaries = getLocalSessionSummaries()
+    assert.equal(summaries.length, 1)
+    assert.equal(summaries[0].id, 's-101')
+    assert.equal(summaries[0].title, 'Fiber Optic Pemda')
+
+    const detail = getLocalSessionDetail('s-101')
+    assert.ok(detail)
+    assert.equal(detail.messages.length, 2)
+
+    clearLocalSessions()
+    assert.deepEqual(getLocalSessions(), [], 'clearLocalSessions must remove all sessions')
+  } finally {
+    delete globalThis.localStorage
+  }
+})
+
+test('ConversationView renders active composer or expired session action without emotes', () => {
+  const active = render('ConversationView', {
+    user: { name: 'User', role: 'Pengguna' },
+    messages: [{ id: 'm1', role: 'assistant', text: 'Halo!' }],
+    isSessionExpired: false,
+  })
+  assert.match(active, /textarea/)
+  assert.match(active, /Tanyakan sesuatu\.\.\./)
+  assert.doesNotMatch(active, /Mulai Sesi Baru/)
+
+  const expired = render('ConversationView', {
+    user: { name: 'User', role: 'Pengguna' },
+    messages: [{ id: 'm1', role: 'assistant', text: 'Sesi berakhir' }],
+    isSessionExpired: true,
+  })
+  assert.doesNotMatch(expired, /textarea/)
+  assert.match(expired, /Mulai Sesi Baru/)
+  assert.doesNotMatch(expired, /🔄/, 'No emoji in action button')
+})
+
+test('HistoryView renders clear history button and item count', () => {
+  const html = render('HistoryView', {
+    items: [{ id: 's1', title: 'APBD', updatedAt: '2026-11-12' }],
+    onBack: () => {},
+    onClearHistory: () => {},
+  })
+  assert.match(html, /Recents \(1\/10\)/)
+  assert.match(html, /Hapus Riwayat/)
+})
+
+test('inactivity thresholds match AWS Lex and OWASP benchmarks', async () => {
+  const { INACTIVITY_INSIGHT_MS, SESSION_TIMEOUT_MS, IDLE_TIMEOUT_MS, SESSION_EXPIRED_MESSAGE } =
+    await server.ssrLoadModule('/src/components/chatbot/ChatOverlay.tsx')
+  assert.equal(INACTIVITY_INSIGHT_MS, 120_000)
+  assert.equal(SESSION_TIMEOUT_MS, 300_000)
+  assert.equal(IDLE_TIMEOUT_MS, 120_000)
+  assert.match(SESSION_EXPIRED_MESSAGE, /5 menit/)
+  assert.match(SESSION_EXPIRED_MESSAGE, /Mulai Sesi Baru/)
+  assert.doesNotMatch(SESSION_EXPIRED_MESSAGE, /⏱️/, 'No emoji in expiration message')
 })

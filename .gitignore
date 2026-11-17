@@ -69,3 +69,6 @@ legacy/
 Thumbs.db
 .vscode/
 .idea/
+start_backend.bat
+*.bat
+

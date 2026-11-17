@@ -1,41 +1,81 @@
 import { cn } from '../../lib/utils'
-import Markdown from 'react-markdown'
+import { useMemo } from 'react'
+import Markdown, { defaultUrlTransform } from 'react-markdown'
 import type { Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
-// Keep default safe URL filtering and skip raw HTML; never use innerHTML.
-const components: Components = {
-  a: ({ children, href, title }) =>
-    href ? (
-      <a href={href} title={title} target="_blank" rel="noopener noreferrer">
-        {children}
-      </a>
-    ) : (
-      <span>{children}</span>
-    ),
-  table: ({ children }) => (
-    <div
-      className={cn(
-        'idmc-markdown__table',
-        '[max-inline-size:100%] [margin-block:var(--idmc-space-3)] overflow-x-auto',
-        '[overscroll-behavior-inline:contain]',
-      )}
-      role="region"
-      aria-label="Tabel jawaban"
-      tabIndex={0}
-    >
-      <table>{children}</table>
-    </div>
-  ),
-  // Replies should not load arbitrary remote images/tracking pixels.
-  img: ({ alt }) => (alt ? <span>{alt}</span> : null),
-}
-
 export interface MarkdownContentProps {
   text: string
+  /** Optional handler when a dynamic prompt hyperlink is clicked */
+  onSendPrompt?: (prompt: string) => void
 }
 
-export function MarkdownContent({ text }: MarkdownContentProps) {
+function customUrlTransform(url: string): string {
+  if (url.startsWith('idmc-prompt:') || url.startsWith('#prompt:')) {
+    return url
+  }
+  return defaultUrlTransform(url)
+}
+
+export function MarkdownContent({ text, onSendPrompt }: MarkdownContentProps) {
+  const components: Components = useMemo(
+    () => ({
+      a: ({ children, href, title }) => {
+        if (href && (href.startsWith('idmc-prompt:') || href.startsWith('#prompt:'))) {
+          const raw = href.replace(/^(idmc-prompt:|#prompt:)/, '')
+          const promptText = decodeURIComponent(raw)
+          return (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                if (onSendPrompt) {
+                  onSendPrompt(promptText)
+                } else if (typeof window !== 'undefined') {
+                  window.postMessage({ type: 'IDMC_SEND_PROMPT', prompt: promptText }, '*')
+                }
+              }}
+              className={cn(
+                'cursor-pointer text-left font-semibold text-[var(--idmc-color-primary-600)]',
+                'underline hover:text-[var(--idmc-color-primary-800)] hover:underline',
+                'focus-visible:outline-2 focus-visible:outline-[var(--idmc-color-primary-500)]',
+                'transition-colors inline font-sans p-0 m-0 bg-transparent border-0',
+              )}
+              title={title ?? `Tanyakan: "${promptText}"`}
+            >
+              {children}
+            </button>
+          )
+        }
+        return href ? (
+          <a href={href} title={title} target="_blank" rel="noopener noreferrer">
+            {children}
+          </a>
+        ) : (
+          <span>{children}</span>
+        )
+      },
+      table: ({ children }) => (
+        <div
+          className={cn(
+            'idmc-markdown__table',
+            '[max-inline-size:100%] [margin-block:var(--idmc-space-3)] overflow-x-auto',
+            '[overscroll-behavior-inline:contain]',
+          )}
+          role="region"
+          aria-label="Tabel jawaban"
+          tabIndex={0}
+        >
+          <table>{children}</table>
+        </div>
+      ),
+      // Replies should not load arbitrary remote images/tracking pixels.
+      img: ({ alt }) => (alt ? <span>{alt}</span> : null),
+    }),
+    [onSendPrompt],
+  )
+
   return (
     <div
       className={cn(
@@ -72,7 +112,12 @@ export function MarkdownContent({ text }: MarkdownContentProps) {
         "[&_input[type='checkbox']]:[accent-color:var(--idmc-color-primary-500)]",
       )}
     >
-      <Markdown remarkPlugins={[remarkGfm]} components={components} skipHtml>
+      <Markdown
+        remarkPlugins={[remarkGfm]}
+        urlTransform={customUrlTransform}
+        components={components}
+        skipHtml
+      >
         {text}
       </Markdown>
     </div>

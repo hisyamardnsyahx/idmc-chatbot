@@ -7,11 +7,22 @@ import type { ChatTransport } from '../api/chatTransport'
 import type { ChatReply, ChatSource } from '../api/types'
 import { CHAT_PORT_NAME, CLIENT_REQUEST_TIMEOUT_MS, isChatPortResponse } from './chatProtocol'
 
-export const sendExtensionChatMessage: ChatTransport = (message, options = {}) =>
-  new Promise((resolve, reject) => {
-    const { sessionId, signal } = options
+function sendOnce(
+  message: string,
+  sessionId?: string,
+  signal?: AbortSignal,
+): Promise<ChatReply> {
+  return new Promise((resolve, reject) => {
     if (signal?.aborted) { reject(signal.reason); return }
-    const port = browser.runtime.connect({ name: CHAT_PORT_NAME })
+    let port: ReturnType<typeof browser.runtime.connect>
+    try {
+      port = browser.runtime.connect({ name: CHAT_PORT_NAME })
+      // Clear any initial connection error flag on native chrome
+      void (globalThis as unknown as { chrome?: { runtime?: { lastError?: unknown } } }).chrome?.runtime?.lastError
+    } catch (connectError) {
+      reject(connectError instanceof Error ? connectError : new Error('Gagal menghubungkan ke ekstensi'))
+      return
+    }
     let settled = false
     const finish = (error?: unknown, reply?: ChatReply) => {
       if (settled) return
@@ -26,8 +37,12 @@ export const sendExtensionChatMessage: ChatTransport = (message, options = {}) =
     const timeout = setTimeout(() => finish(new Error('Chat response timed out')), CLIENT_REQUEST_TIMEOUT_MS)
     signal?.addEventListener('abort', onAbort, { once: true })
     port.onDisconnect.addListener(() => {
-      const error = browser.runtime.lastError
-      finish(new Error(error?.message ?? 'Chat service disconnected'))
+      // Access chrome.runtime.lastError directly so Chromium marks it as checked
+      const chromeGlobal = (globalThis as unknown as { chrome?: { runtime?: { lastError?: { message?: string } } } }).chrome
+      const chromeErr = chromeGlobal?.runtime?.lastError
+      const browserErr = browser.runtime.lastError
+      const errMessage = chromeErr?.message ?? browserErr?.message ?? 'Chat service disconnected'
+      finish(new Error(errMessage))
     })
     port.onMessage.addListener((value: unknown) => {
       if (!isChatPortResponse(value)) { finish(new Error('Invalid chat response')); return }
@@ -47,3 +62,39 @@ export const sendExtensionChatMessage: ChatTransport = (message, options = {}) =
       : { type: 'chat' as const, message }
     try { port.postMessage(request) } catch (error) { finish(error) }
   })
+}
+
+export const sendExtensionChatMessage: ChatTransport = async (message, options = {}) => {
+  const { sessionId, signal } = options
+  if (signal?.aborted) throw signal.reason
+
+  const maxRetries = 2
+  let lastError: unknown = new Error('Chat service disconnected')
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    if (signal?.aborted) throw signal.reason
+    try {
+      return await sendOnce(message, sessionId, signal)
+    } catch (err) {
+      lastError = err
+      // Never retry if service is unconfigured or session expired
+      if (err instanceof ChatServiceUnavailableError || err instanceof ChatSessionNotFoundError) {
+        throw err
+      }
+      const errMsg = err instanceof Error ? err.message : String(err)
+      const isConnectionDrop =
+        errMsg.includes('disconnected') ||
+        errMsg.includes('Receiving end does not exist') ||
+        errMsg.includes('Could not establish connection') ||
+        errMsg.includes('closed before a response')
+
+      // If service worker was dormant/asleep, wait for it to wake up and retry
+      if (isConnectionDrop && attempt < maxRetries && !signal?.aborted) {
+        await new Promise((resolve) => setTimeout(resolve, 250 * (attempt + 1)))
+        continue
+      }
+      throw err
+    }
+  }
+  throw lastError
+}

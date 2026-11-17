@@ -12,12 +12,15 @@ export interface MessageListProps {
   label?: string
   /** Renders the typing indicator after the last message. */
   isAssistantLoading?: boolean
+  /** Optional handler when a prompt hyperlink is clicked in markdown */
+  onSendPrompt?: (prompt: string) => void
 }
 
 export function MessageList({
   messages,
   label = 'Percakapan',
   isAssistantLoading = false,
+  onSendPrompt,
 }: MessageListProps) {
   const listRef = useRef<HTMLUListElement>(null)
 
@@ -59,7 +62,7 @@ export function MessageList({
             sources={role === 'assistant' ? sources : undefined}
           >
             {role === 'assistant' && status !== 'error' ? (
-              <MarkdownContent text={body} />
+              <MarkdownContent text={body} onSendPrompt={onSendPrompt} />
             ) : (
               <span className={cn('idmc-message__plain-text', 'whitespace-pre-wrap')}>{text}</span>
             )}

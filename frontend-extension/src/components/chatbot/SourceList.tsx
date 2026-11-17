@@ -77,7 +77,7 @@ export function SourceList({ sources }: SourceListProps) {
                     'underline [font-weight:600]',
                   )}
                 >
-                  <span>🔗 Buka di Portal IDMC</span>
+                  <span>Buka di Portal IDMC</span>
                   <span aria-hidden="true">↗</span>
                 </a>
               )}

@@ -16,6 +16,10 @@ export interface ConversationViewProps {
   onClose?: () => void
   /** Shows the header history button when provided. */
   onOpenHistory?: () => void
+  /** When true, indicates that the session has timed out due to 5 minutes of inactivity */
+  isSessionExpired?: boolean
+  /** Action to restart a fresh session when expired */
+  onResetSession?: () => void
 }
 
 /** Chat state (HiFi node 1:20907). The sidebar is hidden in the HiFi and not implemented. */
@@ -25,6 +29,8 @@ export function ConversationView({
   onSend,
   onClose,
   onOpenHistory,
+  isSessionExpired = false,
+  onResetSession,
 }: ConversationViewProps) {
   return (
     <section
@@ -38,7 +44,11 @@ export function ConversationView({
       aria-label="Percakapan"
     >
       <ChatHeader title="Chatbot Data Publik" onOpenHistory={onOpenHistory} onClose={onClose} />
-      <MessageList messages={messages} isAssistantLoading={isAssistantLoading} />
+      <MessageList
+        messages={messages}
+        isAssistantLoading={isAssistantLoading}
+        onSendPrompt={onSend}
+      />
       <div
         className={cn(
           'idmc-view__footer idmc-conversation__footer',
@@ -46,13 +56,25 @@ export function ConversationView({
           '[padding-block-start:var(--idmc-content-gap)] short:[padding-block-start:var(--idmc-space-1)]',
         )}
       >
-        <ChatInput
-          variant="chat"
-          placeholder="Tanyakan sesuatu..."
-          onSubmit={onSend}
-          submitDisabled={isAssistantLoading}
-          autoFocus
-        />
+        {isSessionExpired ? (
+          <div className="flex flex-col items-center gap-2 w-full py-1">
+            <button
+              type="button"
+              onClick={onResetSession}
+              className="w-full py-2.5 px-4 rounded-full bg-[var(--idmc-color-primary-300)] text-[var(--idmc-color-neutral-100)] font-medium text-sm hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+            >
+              Mulai Sesi Baru
+            </button>
+          </div>
+        ) : (
+          <ChatInput
+            variant="chat"
+            placeholder="Tanyakan sesuatu..."
+            onSubmit={onSend}
+            submitDisabled={isAssistantLoading}
+            autoFocus
+          />
+        )}
       </div>
     </section>
   )

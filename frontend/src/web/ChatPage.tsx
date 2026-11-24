@@ -32,7 +32,6 @@ import { conversationTitle, newConversation } from '../components/chatbot/conver
 import type { SavedConversation } from '../components/chatbot/conversation'
 import type { ChatMessage } from '../components/chatbot/types'
 import {
-  INACTIVITY_INSIGHT_MS,
   SESSION_TIMEOUT_MS,
   SESSION_EXPIRED_MESSAGE,
 } from '../components/chatbot/ChatOverlay'
@@ -178,8 +177,8 @@ function Conversation({
   const [isSessionExpired, setIsSessionExpired] = useState(false)
   const isSessionExpiredRef = useRef(false)
   const lastActivityTimeRef = useRef<number>(Date.now())
-  const lastInsightTimeRef = useRef<number>(0)
-  const customInsightMsRef = useRef<number | null>(null)
+  const warningSentRef = useRef<boolean>(false)
+  const customWarningMsRef = useRef<number | null>(null)
   const customTimeoutMsRef = useRef<number | null>(null)
   const conversationRef = useRef<HTMLDivElement>(null)
 
@@ -190,7 +189,7 @@ function Conversation({
   const recordActivity = useCallback(() => {
     if (isSessionExpiredRef.current) return
     lastActivityTimeRef.current = Date.now()
-    lastInsightTimeRef.current = 0
+    warningSentRef.current = false
   }, [])
 
   const handleSendMessage = useCallback(
@@ -198,6 +197,7 @@ function Conversation({
       recordActivity()
       isSessionExpiredRef.current = false
       setIsSessionExpired(false)
+      warningSentRef.current = false
       void sendMessage(text)
     },
     [recordActivity, sendMessage],
@@ -224,14 +224,6 @@ function Conversation({
     return insight
   }, [])
 
-  const getInactivityInsightMs = useCallback((): number => {
-    if (customInsightMsRef.current != null) return customInsightMsRef.current
-    if (typeof window !== 'undefined' && (window as any).__IDMC_INSIGHT_MS__) {
-      return Number((window as any).__IDMC_INSIGHT_MS__)
-    }
-    return INACTIVITY_INSIGHT_MS
-  }, [])
-
   const getSessionTimeoutMs = useCallback((): number => {
     if (customTimeoutMsRef.current != null) return customTimeoutMsRef.current
     if (typeof window !== 'undefined' && (window as any).__IDMC_TIMEOUT_MS__) {
@@ -242,14 +234,14 @@ function Conversation({
 
   useEffect(() => {
     lastActivityTimeRef.current = Date.now()
-    lastInsightTimeRef.current = 0
+    warningSentRef.current = false
 
     console.info(
-      `[IDMC Chatbot Web] Mesin Idle Aktif: Tier 1 Insight = ${Math.floor(getInactivityInsightMs() / 1000)}s, Tier 2 Timeout = ${Math.floor(getSessionTimeoutMs() / 1000)}s.\n` +
+      `[IDMC Chatbot Web] Timer Inaktivitas Aktif: Sesi akan diputus otomatis jika tidak ada input selama ${Math.floor(getSessionTimeoutMs() / 1000)}s (5 menit).\n` +
       `Panduan Pengujian Cepat di Console:\n` +
-      `  - Uji Wawasan Instan: window.postMessage({ type: 'IDMC_TRIGGER_INSIGHT' }, '*')\n` +
-      `  - Uji Selesai Sesi Instan: window.postMessage({ type: 'IDMC_TRIGGER_TIMEOUT' }, '*')\n` +
-      `  - Mode Cepat (10s/25s): window.postMessage({ type: 'IDMC_SET_FAST_TIMERS' }, '*')`,
+      `  - Putus Sesi Seketika (1s): window.postMessage({ type: 'IDMC_TRIGGER_TIMEOUT' }, '*')\n` +
+      `  - Mode Uji Cepat (10s peringatan / 15s putus): window.postMessage({ type: 'IDMC_SET_FAST_TIMERS' }, '*')\n` +
+      `  - Kembalikan ke Standar (5 menit): window.postMessage({ type: 'IDMC_RESET_TIMERS' }, '*')`,
     )
 
     let lastLoggedSecond = 0
@@ -261,33 +253,41 @@ function Conversation({
 
       const now = Date.now()
       const idleMs = now - lastActivityTimeRef.current
-      const insightMs = getInactivityInsightMs()
       const timeoutMs = getSessionTimeoutMs()
+      const warningMs =
+        customWarningMsRef.current ??
+        (timeoutMs > 60_000 ? timeoutMs - 60_000 : Math.floor(timeoutMs * 0.7))
       const idleSec = Math.floor(idleMs / 1000)
 
       if (idleSec > 0 && idleSec % 30 === 0 && idleSec !== lastLoggedSecond) {
         lastLoggedSecond = idleSec
-        console.log(`[IDMC Chatbot Web] Waktu idle: ${idleSec}s (Target Insight: ${Math.floor(insightMs / 1000)}s | Target Timeout: ${Math.floor(timeoutMs / 1000)}s)`)
+        console.log(
+          `[IDMC Chatbot Web] Waktu idle: ${idleSec}s / ${Math.floor(timeoutMs / 1000)}s (Peringatan: ${Math.floor(warningMs / 1000)}s | Sesi diputus: ${Math.floor(timeoutMs / 1000)}s)`,
+        )
       }
 
-      // Tier 2: 5 minutes idle -> Graceful Session Expiration
+      // Step 2: 5 minutes idle -> Graceful Session Expiration (Sesi Diputus)
       if (idleMs >= timeoutMs) {
         isSessionExpiredRef.current = true
         setIsSessionExpired(true)
         appendMessage('assistant', SESSION_EXPIRED_MESSAGE)
-        console.warn(`[IDMC Chatbot Web] Tier 2 Trigger: Sesi ditutup otomatis setelah ${idleSec}s tidak aktif (AWS Lex/OWASP benchmark).`)
+        console.warn(
+          `[IDMC Chatbot Web] Sesi diputus otomatis setelah ${idleSec}s tidak aktif (Batas: ${Math.floor(timeoutMs / 1000)}s).`,
+        )
         return
       }
 
-      // Tier 1: 2 minutes idle -> Proactive Dynamic Rotating Insight
-      if (idleMs >= insightMs) {
-        const msSinceLastInsight = now - lastInsightTimeRef.current
-        if (lastInsightTimeRef.current === 0 || msSinceLastInsight >= insightMs) {
-          lastInsightTimeRef.current = now
-          const insight = getNextInsight()
-          appendMessage('assistant', formatInsightMessage(insight))
-          console.info(`[IDMC Chatbot Web] Tier 1 Trigger: Wawasan dataset ditampilkan (${idleSec}s idle): "${insight.title}"`)
-        }
+      // Step 1: 4 minutes idle -> 1-minute warning notice
+      if (idleMs >= warningMs && !warningSentRef.current) {
+        warningSentRef.current = true
+        appendMessage(
+          'assistant',
+          '**Peringatan Tidak Aktif**\n\n' +
+          'Sesi percakapan Anda tidak aktif selama 4 menit. Jika tidak ada aktivitas atau pertanyaan baru, sesi akan diputus otomatis dalam 1 menit.',
+        )
+        console.info(
+          `[IDMC Chatbot Web] Peringatan tidak aktif ditampilkan (${idleSec}s idle).`,
+        )
       }
     }
 
@@ -313,37 +313,40 @@ function Conversation({
         isSessionExpiredRef.current = true
         setIsSessionExpired(true)
         appendMessage('assistant', SESSION_EXPIRED_MESSAGE)
-        console.warn('[IDMC Chatbot Web] Manual Trigger: Sesi expired berhasil dimunculkan.')
+        console.warn('[IDMC Chatbot Web] Manual Trigger: Sesi diputus berhasil dimunculkan.')
       } else if (data.type === 'IDMC_SET_FAST_TIMERS') {
-        customInsightMsRef.current = 10_000
-        customTimeoutMsRef.current = 25_000
+        customWarningMsRef.current = 10_000
+        customTimeoutMsRef.current = 15_000
         lastActivityTimeRef.current = Date.now()
-        lastInsightTimeRef.current = 0
-        console.info('[IDMC Chatbot Web] Fast timers aktif: Insight = 10s, Timeout = 25s.')
+        warningSentRef.current = false
+        console.info('[IDMC Chatbot Web] Mode Uji Cepat Aktif: Peringatan = 10s, Sesi Diputus = 15s.')
+      } else if (data.type === 'IDMC_RESET_TIMERS') {
+        customWarningMsRef.current = null
+        customTimeoutMsRef.current = null
+        lastActivityTimeRef.current = Date.now()
+        warningSentRef.current = false
+        console.info('[IDMC Chatbot Web] Timers kembali ke standar: Peringatan = 240s, Sesi Diputus = 300s (5 menit).')
       } else if (data.type === 'IDMC_SEND_PROMPT' && typeof data.prompt === 'string') {
         handleSendMessage(data.prompt)
       }
     }
     window.addEventListener('message', handleMessage)
 
-    const convEl = conversationRef.current
-    const handleKeyDown = () => {
+    const handleUserActivity = () => {
       recordActivity()
     }
-    if (convEl) {
-      convEl.addEventListener('keydown', handleKeyDown, { passive: true })
-    }
+    window.addEventListener('keydown', handleUserActivity, { passive: true })
+    window.addEventListener('pointerdown', handleUserActivity, { passive: true })
 
     return () => {
       window.clearInterval(intervalId)
       document.removeEventListener('visibilitychange', handleVisibility)
       window.removeEventListener('focus', handleVisibility)
       window.removeEventListener('message', handleMessage)
-      if (convEl) {
-        convEl.removeEventListener('keydown', handleKeyDown)
-      }
+      window.removeEventListener('keydown', handleUserActivity)
+      window.removeEventListener('pointerdown', handleUserActivity)
     }
-  }, [appendMessage, getInactivityInsightMs, getNextInsight, getSessionTimeoutMs, handleSendMessage, isAssistantLoading, recordActivity])
+  }, [appendMessage, getNextInsight, getSessionTimeoutMs, handleSendMessage, isAssistantLoading, recordActivity])
 
   const latest = useRef({ messages, isAssistantLoading })
   useEffect(() => {

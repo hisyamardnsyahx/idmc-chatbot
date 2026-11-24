@@ -28,7 +28,10 @@ export function useChatSession(
 
   const appendMessage = useCallback(
     (role: MessageRole, text: string, status?: 'error', sources?: ChatSource[]) => {
-      const id = `m${nextMessageId.current++}`
+      const id =
+        typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+          ? crypto.randomUUID()
+          : `m_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
       setMessages((previous) => [
         ...previous,
         { id, role, text, status, sources },

@@ -126,6 +126,8 @@ export function ChatOverlay({
   // Wall-clock tracking refs (immune to timer drift and mousemove jitter)
   const lastActivityTimeRef = useRef<number>(Date.now())
   const lastInsightTimeRef = useRef<number>(0)
+  const warningSentRef = useRef<boolean>(false)
+  const customWarningMsRef = useRef<number | null>(null)
   const isSessionExpiredRef = useRef<boolean>(false)
 
   // Keep isSessionExpiredRef in sync
@@ -140,6 +142,7 @@ export function ChatOverlay({
     if (isSessionExpiredRef.current) return
     lastActivityTimeRef.current = Date.now()
     lastInsightTimeRef.current = 0
+    warningSentRef.current = false
   }, [])
 
   // Final step of closing: unmount the panel and preserve conversation state.
@@ -220,36 +223,40 @@ export function ChatOverlay({
 
       const now = Date.now()
       const idleMs = now - lastActivityTimeRef.current
-      const insightMs = getInactivityInsightMs()
       const timeoutMs = getSessionTimeoutMs()
+      const warningMs =
+        customWarningMsRef.current ??
+        (timeoutMs > 60_000 ? timeoutMs - 60_000 : Math.floor(timeoutMs * 0.7))
       const idleSec = Math.floor(idleMs / 1000)
 
       // Periodic observable log every 30s
       if (idleSec > 0 && idleSec % 30 === 0 && idleSec !== lastLoggedSecond) {
         lastLoggedSecond = idleSec
-        console.log(`[IDMC Chatbot] Waktu idle: ${idleSec}s (Target Insight: ${Math.floor(insightMs / 1000)}s | Target Timeout: ${Math.floor(timeoutMs / 1000)}s)`)
+        console.log(
+          `[IDMC Chatbot] Waktu idle: ${idleSec}s / ${Math.floor(timeoutMs / 1000)}s (Peringatan: ${Math.floor(warningMs / 1000)}s | Sesi Diputus: ${Math.floor(timeoutMs / 1000)}s)`,
+        )
       }
 
-      // Tier 2: 5 minutes idle -> Graceful Session Expiration
+      // Step 2: 5 minutes idle -> Graceful Session Expiration (Sesi Diputus)
       if (idleMs >= timeoutMs) {
         isSessionExpiredRef.current = true
         setIsSessionExpired(true)
         appendMessage('assistant', SESSION_EXPIRED_MESSAGE)
         setView((current) => (current === 'home' ? 'chat' : current))
-        console.warn(`[IDMC Chatbot] Tier 2 Trigger: Sesi ditutup otomatis setelah ${idleSec}s tidak aktif (AWS Lex/OWASP benchmark).`)
+        console.warn(`[IDMC Chatbot] Sesi diputus otomatis setelah ${idleSec}s tidak aktif.`)
         return
       }
 
-      // Tier 1: 2 minutes idle -> Proactive Dynamic Rotating Insight
-      if (idleMs >= insightMs) {
-        const msSinceLastInsight = now - lastInsightTimeRef.current
-        if (lastInsightTimeRef.current === 0 || msSinceLastInsight >= insightMs) {
-          lastInsightTimeRef.current = now
-          const insight = getNextInsight()
-          appendMessage('assistant', formatInsightMessage(insight))
-          setView((current) => (current === 'home' ? 'chat' : current))
-          console.info(`[IDMC Chatbot] Tier 1 Trigger: Wawasan dataset ditampilkan (${idleSec}s idle): "${insight.title}"`)
-        }
+      // Step 1: 4 minutes idle -> 1-minute warning notice
+      if (idleMs >= warningMs && !warningSentRef.current) {
+        warningSentRef.current = true
+        appendMessage(
+          'assistant',
+          '**Peringatan Tidak Aktif**\n\n' +
+          'Sesi percakapan Anda tidak aktif selama 4 menit. Jika tidak ada aktivitas atau pertanyaan baru, sesi akan diputus otomatis dalam 1 menit.',
+        )
+        setView((current) => (current === 'home' ? 'chat' : current))
+        console.info(`[IDMC Chatbot] Peringatan tidak aktif ditampilkan (${idleSec}s idle).`)
       }
     }
 
@@ -281,13 +288,17 @@ export function ChatOverlay({
         setView((current) => (current === 'home' ? 'chat' : current))
         console.warn('[IDMC Chatbot] Manual Trigger: Sesi expired berhasil dimunculkan.')
       } else if (data.type === 'IDMC_SET_FAST_TIMERS') {
-        customInsightMsRef.current = 10_000
-        customTimeoutMsRef.current = 25_000
-        console.info('[IDMC Chatbot] Mode Cepat Aktif: Insight 10 detik, Timeout 25 detik.')
+        customWarningMsRef.current = 10_000
+        customTimeoutMsRef.current = 15_000
+        lastActivityTimeRef.current = Date.now()
+        warningSentRef.current = false
+        console.info('[IDMC Chatbot] Mode Uji Cepat Aktif: Peringatan = 10s, Sesi Diputus = 15s.')
       } else if (data.type === 'IDMC_RESET_TIMERS') {
-        customInsightMsRef.current = null
+        customWarningMsRef.current = null
         customTimeoutMsRef.current = null
-        console.info('[IDMC Chatbot] Timers kembali ke standar: Insight 120 detik, Timeout 300 detik.')
+        lastActivityTimeRef.current = Date.now()
+        warningSentRef.current = false
+        console.info('[IDMC Chatbot] Timers kembali ke standar: Peringatan = 240s, Sesi Diputus = 300s (5 menit).')
       } else if (data.type === 'IDMC_SEND_PROMPT' && typeof data.prompt === 'string') {
         recordActivity()
         setIsSessionExpired(false)

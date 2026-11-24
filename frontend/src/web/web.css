@@ -79,11 +79,32 @@
   overflow-y: auto;
   padding: 8px 12px;
 }
+.web-history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 12px 10px;
+}
 .web-history-label {
   font: var(--idmc-type-b4);
   font-weight: 500;
-  margin: 0 12px 12px;
+  margin: 0;
   color: var(--idmc-color-neutral-600);
+}
+.web-clear-all-btn {
+  background: transparent;
+  border: 0;
+  padding: 3px 7px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--idmc-color-neutral-600);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 120ms ease;
+}
+.web-clear-all-btn:hover {
+  background: #fee2e2;
+  color: #991b1b;
 }
 .web-empty-history {
   margin: 0 12px;
@@ -104,7 +125,7 @@
   align-items: center;
   gap: 10px;
   width: 100%;
-  padding: 11px 35px 11px 12px;
+  padding: 10px 58px 10px 12px;
   border: 0;
   border-radius: var(--idmc-radius-2);
   color: var(--idmc-color-neutral-700);
@@ -112,6 +133,7 @@
   text-align: left;
   font: inherit;
   cursor: pointer;
+  transition: background 120ms ease;
 }
 .web-history-button span {
   overflow: hidden;
@@ -126,28 +148,88 @@
   background: var(--idmc-color-primary-10-a10);
   color: var(--idmc-color-primary-500);
 }
-.web-delete-chat {
+.web-history-actions {
   position: absolute;
   right: 4px;
-  top: 8px;
+  top: 7px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+.web-sidebar-menu li:hover .web-history-actions,
+.web-sidebar-menu li:focus-within .web-history-actions {
+  opacity: 1;
+}
+.web-action-btn {
   display: grid;
   place-items: center;
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   padding: 0;
   border: 0;
-  border-radius: 6px;
+  border-radius: 4px;
   background: transparent;
   color: var(--idmc-color-neutral-600);
   cursor: pointer;
-  opacity: 0;
+  transition: all 120ms ease;
 }
-.web-sidebar-menu li:hover .web-delete-chat,
-.web-sidebar-menu li:focus-within .web-delete-chat {
-  opacity: 1;
+.web-rename-chat:hover {
+  background: var(--idmc-color-primary-100);
+  color: var(--idmc-color-primary-500);
 }
 .web-delete-chat:hover {
-  background: var(--idmc-color-primary-100);
+  background: #fee2e2;
+  color: #991b1b;
+}
+.web-rename-form {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  padding: 4px 6px;
+}
+.web-rename-input {
+  flex: 1;
+  min-width: 0;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid var(--idmc-color-primary-300);
+  border-radius: 4px;
+  font: inherit;
+  font-size: 13px;
+  background: #ffffff;
+  color: var(--idmc-color-neutral-900);
+  outline: none;
+}
+.web-rename-input:focus {
+  box-shadow: 0 0 0 2px var(--idmc-color-primary-10-a10);
+}
+.web-rename-action {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+.web-rename-save {
+  color: #166534;
+}
+.web-rename-save:hover {
+  background: #dcfce7;
+}
+.web-rename-cancel {
+  color: #6b7280;
+}
+.web-rename-cancel:hover {
+  background: #f3f4f6;
+  color: #111827;
 }
 .web-sidebar-footer {
   padding: 16px 20px;
@@ -194,6 +276,8 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
 }
 .web-header {
   height: 76px;
@@ -205,6 +289,7 @@
   font: var(--idmc-type-b3);
   font-weight: 500;
   color: var(--idmc-color-primary-500);
+  border-bottom: 1px solid #eae5de;
 }
 .web-icon-button {
   width: 36px;
@@ -231,19 +316,59 @@
   outline: 2px solid var(--idmc-color-primary-300);
   outline-offset: 2px;
 }
-.web-conversation {
-  width: min(100%, 840px);
-  margin-inline: auto;
-  padding: 0 32px 24px;
+.web-chat-layout {
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  overflow: hidden;
 }
-.web-conversation-home {
-  justify-content: center;
-  padding-bottom: clamp(32px, 15vh, 160px);
+/* Scroll area spans 100% of the pane so the scrollbar sits right at the extreme right edge */
+.web-scroll-area {
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.22) transparent;
+}
+.web-scroll-area::-webkit-scrollbar {
+  width: 8px;
+}
+.web-scroll-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+.web-scroll-area::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.18);
+  border-radius: 4px;
+}
+.web-scroll-area::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.35);
+}
+.web-messages-wrapper {
+  width: min(100%, 840px);
+  margin-inline: auto;
+  padding: 0 32px 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.web-home-scroll-area {
+  display: flex;
+  flex-direction: column;
+}
+.web-home-container {
+  width: min(100%, 840px);
+  margin-inline: auto;
+  padding: 0 32px clamp(32px, 15vh, 160px);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 .web-welcome {
   text-align: center;
@@ -290,10 +415,52 @@
 .web-privacy-banner-link:hover {
   color: var(--idmc-color-primary-700);
 }
+.web-composer-wrapper {
+  width: 100%;
+  flex-shrink: 0;
+  padding: 0 32px 24px;
+}
+.web-composer-wrapper .web-composer {
+  width: min(100%, 840px);
+  margin-inline: auto;
+}
+.web-composer {
+  flex-shrink: 0;
+}
+.idmc-chat-input {
+  --idmc-composer-height: 62px;
+  box-shadow: var(--idmc-shadow-e2);
+}
+.idmc-suggestion-list {
+  justify-content: center;
+  margin-top: 16px;
+}
+.web-conversation .idmc-message-list,
+.web-messages-wrapper .idmc-message-list {
+  border: 0;
+  background: transparent;
+  border-radius: 0;
+  padding: 24px 0;
+  gap: 24px;
+  overflow-y: visible;
+  height: auto;
+  flex: none;
+}
+.idmc-message__bubble {
+  padding: 14px 20px;
+  line-height: 1.7;
+}
+.web-composer-note {
+  margin: 12px 0 0;
+  text-align: center;
+  font: var(--idmc-type-b4);
+  color: var(--idmc-color-neutral-600);
+}
+/* Minimalist Anti-Slop Privacy Modal */
 .web-privacy-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(2px);
   z-index: 1000;
   display: grid;
@@ -302,9 +469,10 @@
 }
 .web-privacy-modal {
   background: #ffffff;
-  border-radius: var(--idmc-radius-4);
-  box-shadow: var(--idmc-shadow-e4);
-  max-width: 680px;
+  border-radius: 12px;
+  border: 1px solid #eae5de;
+  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
+  max-width: 660px;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
@@ -316,33 +484,36 @@
   align-items: flex-start;
   justify-content: space-between;
   padding: 24px 28px 16px;
-  border-bottom: 1px solid #eae5de;
+  border-bottom: 1px solid #eeebe5;
 }
 .web-privacy-modal-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font: var(--idmc-type-h5);
-  color: var(--idmc-color-primary-500);
-  font-weight: 700;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  letter-spacing: -0.01em;
 }
 .web-privacy-modal-subtitle {
-  font: var(--idmc-type-b4);
-  color: var(--idmc-color-neutral-600);
-  margin-top: 4px;
+  font-size: 13px;
+  color: #6b7280;
+  margin: 4px 0 0;
+  line-height: 1.4;
 }
 .web-privacy-modal-close {
   background: transparent;
   border: 0;
   padding: 6px;
-  border-radius: var(--idmc-radius-2);
-  color: var(--idmc-color-neutral-500);
+  border-radius: 6px;
+  color: #6b7280;
   cursor: pointer;
-  transition: background 150ms ease;
+  transition: all 120ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .web-privacy-modal-close:hover {
-  background: var(--idmc-color-neutral-200);
-  color: var(--idmc-color-neutral-800);
+  background: #f3f0ea;
+  color: #111827;
 }
 .web-privacy-modal-body {
   padding: 24px 28px;
@@ -360,105 +531,139 @@
     grid-template-columns: 1fr;
   }
 }
-.web-privacy-card {
-  border-radius: var(--idmc-radius-3);
-  padding: 16px 18px;
+.web-privacy-section {
+  background: #faf9f6;
+  border: 1px solid #eae5de;
+  border-radius: 8px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
-.web-privacy-card-recorded {
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
+.web-privacy-section-heading {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #4b5563;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eae5de;
 }
-.web-privacy-card-not-recorded {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-}
-.web-privacy-card-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font: var(--idmc-type-b3);
-  font-weight: 700;
-}
-.web-privacy-card-recorded .web-privacy-card-header {
-  color: #166534;
-}
-.web-privacy-card-not-recorded .web-privacy-card-header {
-  color: #991b1b;
-}
-.web-privacy-list {
+.web-privacy-clean-list {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  font: var(--idmc-type-b4);
-  line-height: 1.45;
+  gap: 12px;
 }
-.web-privacy-list li {
+.web-privacy-clean-list li {
   display: flex;
-  align-items: flex-start;
-  gap: 8px;
+  flex-direction: column;
+  gap: 2px;
 }
-.web-privacy-card-recorded .web-privacy-list li {
-  color: #14532d;
+.web-privacy-item-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1f2937;
 }
-.web-privacy-card-not-recorded .web-privacy-list li {
-  color: #7f1d1d;
-}
-.web-privacy-legal {
-  padding: 14px 16px;
-  background: var(--idmc-color-neutral-100);
-  border-radius: var(--idmc-radius-2);
-  border-left: 3px solid var(--idmc-color-primary-300);
-  font: var(--idmc-type-b4);
-  color: var(--idmc-color-neutral-600);
+.web-privacy-clean-list p {
+  margin: 0;
+  font-size: 12.5px;
   line-height: 1.5;
+  color: #4b5563;
+}
+.web-privacy-footer-note {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: #6b7280;
+  padding: 12px 14px;
+  background: #f8f6f2;
+  border-radius: 6px;
+  border: 1px solid #e8e3dc;
 }
 .web-privacy-modal-footer {
   padding: 16px 28px;
-  border-top: 1px solid #eae5de;
+  border-top: 1px solid #eeebe5;
   display: flex;
   justify-content: flex-end;
 }
 .web-privacy-modal-dismiss {
   padding: 8px 20px;
-  border-radius: 9999px;
-  background: var(--idmc-color-primary-300);
+  border-radius: 6px;
+  background: #8b0000;
   color: #ffffff;
   border: 0;
-  font: var(--idmc-type-b3);
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: background 150ms ease;
 }
 .web-privacy-modal-dismiss:hover {
-  filter: brightness(1.1);
+  background: #6e0000;
 }
-.web-composer {
-  flex-shrink: 0;
+/* Confirmation Modal for Clearing All History */
+.web-confirm-modal {
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #eae5de;
+  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.16);
+  max-width: 420px;
+  width: 100%;
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
-.web-conversation .idmc-chat-input {
-  --idmc-composer-height: 62px;
-  box-shadow: var(--idmc-shadow-e2);
+.web-confirm-modal-header {
+  margin: 0;
 }
-.web-conversation .idmc-suggestion-list {
-  justify-content: center;
-  margin-top: 16px;
+.web-confirm-modal-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
 }
-.web-conversation .idmc-message-list {
+.web-confirm-modal-body p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #4b5563;
+}
+.web-confirm-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+}
+.web-confirm-btn-cancel {
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #374151;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+.web-confirm-btn-cancel:hover {
+  background: #f9fafb;
+}
+.web-confirm-btn-danger {
+  padding: 6px 14px;
+  border-radius: 6px;
   border: 0;
-  background: transparent;
-  border-radius: 0;
-  padding: 24px 0;
-  gap: 24px;
+  background: #991b1b;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 120ms ease;
 }
-.web-conversation .idmc-message__bubble {
-  padding: 14px 20px;
-  line-height: 1.7;
+.web-confirm-btn-danger:hover {
+  background: #7f1d1d;
 }
 .web-composer-note {
   margin: 12px 0 0;

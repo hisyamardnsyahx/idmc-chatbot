@@ -246,3 +246,22 @@ def api_delete_session(session_id: str) -> dict[str, Any]:
     if not ok:
         raise HTTPException(status_code=404, detail="session not found")
     return {"deleted": session_id}
+
+
+@app.patch("/api/sessions/{session_id}")
+def api_rename_session(session_id: str, req: schemas.SessionRenameRequest) -> dict[str, Any]:
+    if not re.match(r"^[a-zA-Z0-9_-]{1,64}$", session_id):
+        raise HTTPException(status_code=400, detail="Invalid session ID format")
+    new_title = req.title.strip()
+    if not new_title:
+        raise HTTPException(status_code=400, detail="Title cannot be empty")
+    s = session_store.rename_session(session_id, new_title)
+    if s is None:
+        raise HTTPException(status_code=404, detail="session not found")
+    return {"id": session_id, "title": s["title"], "updated_at": s["updated_at"]}
+
+
+@app.delete("/api/sessions")
+def api_clear_all_sessions() -> dict[str, Any]:
+    count = session_store.clear_all_sessions()
+    return {"cleared": count}

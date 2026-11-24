@@ -58,6 +58,10 @@ class SessionDetail(BaseModel):
     turns: list[Turn] = Field(default_factory=list)
 
 
+class SessionRenameRequest(BaseModel):
+    title: str = Field(..., min_length=1, max_length=100)
+
+
 class StatsResponse(BaseModel):
     collection: str
     count: int

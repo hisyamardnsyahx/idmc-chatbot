@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   ArrowUpRight,
-  CheckCircle2,
+  Check,
   MessageSquare,
+  Pencil,
   Plus,
   ShieldCheck,
   Trash2,
   X,
-  XCircle,
 } from 'lucide-react'
 import idmcIcon from '../assets/figma/idmc-logo.svg'
 import {
@@ -45,7 +45,7 @@ import {
   initialConversation,
   readConversations,
 } from './conversationStorage'
-import { deleteSession, getSession, listSessions } from '../api/sessionsApi'
+import { clearAllSessions, deleteSession, getSession, listSessions, renameSession } from '../api/sessionsApi'
 
 const suggestions = [
   'Berapa jumlah sentra industri kecil dan menengah (IKM) di DIY?',
@@ -76,12 +76,11 @@ function PrivacyModal({
       <div className="web-privacy-modal">
         <div className="web-privacy-modal-header">
           <div>
-            <div className="web-privacy-modal-title" id="privacy-modal-title">
-              <ShieldCheck size={22} className="text-[var(--idmc-color-primary-500)]" />
-              <span>Transparansi & Kebijakan Data</span>
-            </div>
+            <h2 className="web-privacy-modal-title" id="privacy-modal-title">
+              Kebijakan Data & Privasi
+            </h2>
             <p className="web-privacy-modal-subtitle">
-              Kepatuhan UU No. 27 Tahun 2022 tentang Pelindungan Data Pribadi (PDP)
+              Pemberitahuan pengelolaan data pada Chatbot Data Publik IDMC Pemda DIY
             </p>
           </div>
           <button
@@ -90,57 +89,51 @@ function PrivacyModal({
             onClick={onClose}
             aria-label="Tutup kebijakan privasi"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
 
         <div className="web-privacy-modal-body">
           <div className="web-privacy-grid">
-            <div className="web-privacy-card web-privacy-card-recorded">
-              <div className="web-privacy-card-header">
-                <CheckCircle2 size={18} />
-                <span>Data yang DICATAT</span>
-              </div>
-              <ul className="web-privacy-list">
+            <div className="web-privacy-section">
+              <h3 className="web-privacy-section-heading">Data yang Diproses</h3>
+              <ul className="web-privacy-clean-list">
                 <li>
-                  <span>• <strong>Pertanyaan & Jawaban:</strong> Diproses secara anonim untuk penjawaban data agregat daerah.</span>
+                  <span className="web-privacy-item-title">Pertanyaan pencarian</span>
+                  <p>Teks pertanyaan diproses untuk mencocokkan topik dan data agregat statistik yang relevan dari dashboard Pemda DIY.</p>
                 </li>
                 <li>
-                  <span>• <strong>ID Sesi Anonim:</strong> Token sesi acak sementara untuk mengelompokkan percakapan saat aktif.</span>
+                  <span className="web-privacy-item-title">ID sesi sementara</span>
+                  <p>Token acak lokal untuk menjaga kesinambungan konteks tanya jawab selama jendela percakapan aktif.</p>
                 </li>
                 <li>
-                  <span>• <strong>Waktu Interaksi:</strong> Stempel waktu (timestamp) untuk mengurutkan riwayat percakapan.</span>
-                </li>
-                <li>
-                  <span>• <strong>Riwayat Browser:</strong> Disimpan di peramban Anda (localStorage) agar Anda dapat melanjutkannya.</span>
+                  <span className="web-privacy-item-title">Penyimpanan di peramban</span>
+                  <p>Riwayat percakapan tersimpan secara privat di peramban lokal (localStorage) perangkat Anda dan dapat dihapus sewaktu-waktu.</p>
                 </li>
               </ul>
             </div>
 
-            <div className="web-privacy-card web-privacy-card-not-recorded">
-              <div className="web-privacy-card-header">
-                <XCircle size={18} />
-                <span>Data yang TIDAK Dicatat</span>
-              </div>
-              <ul className="web-privacy-list">
+            <div className="web-privacy-section">
+              <h3 className="web-privacy-section-heading">Data yang Tidak Dikumpulkan</h3>
+              <ul className="web-privacy-clean-list">
                 <li>
-                  <span>• <strong>Identitas Pribadi (PII):</strong> Nama lengkap, NIK, alamat rumah, nomor HP, atau email.</span>
+                  <span className="web-privacy-item-title">Identitas pribadi (PII)</span>
+                  <p>Sistem tidak pernah meminta, mencatat, atau memproses NIK, nama lengkap, alamat tempat tinggal, atau kontak pribadi.</p>
                 </li>
                 <li>
-                  <span>• <strong>Kredensial & Sandi:</strong> Password, kata sandi, atau token autentikasi akun IDMC.</span>
+                  <span className="web-privacy-item-title">Kredensial & akun</span>
+                  <p>Tidak ada pencatatan kata sandi, token autentikasi, atau data rahasia akun pengguna.</p>
                 </li>
                 <li>
-                  <span>• <strong>Lokasi Presisi:</strong> Koordinat GPS perangkat atau pelacakan IP address perorangan.</span>
-                </li>
-                <li>
-                  <span>• <strong>Aktivitas Web Lain:</strong> Riwayat penjelajahan tab atau situs lain di luar chatbot IDMC.</span>
+                  <span className="web-privacy-item-title">Pelacakan lokasi & eksternal</span>
+                  <p>Tidak ada pelacakan koordinat GPS perangkat, alamat IP perorangan, maupun riwayat penjelajahan di luar aplikasi ini.</p>
                 </li>
               </ul>
             </div>
           </div>
 
-          <div className="web-privacy-legal">
-            <strong>Prinsip Minimasi Data:</strong> Layanan chatbot IDMC Pemda DIY beroperasi secara tertutup pada basis pengetahuan agregat data publik (RAG). Tidak ada profil pengguna perorangan yang dibentuk atau diperjualbelikan.
+          <div className="web-privacy-footer-note">
+            Chatbot beroperasi pada basis pengetahuan agregat data terbuka Pemerintah Daerah DIY. Pengguna memegang kendali penuh atas data percakapan dan dapat membersihkan seluruh riwayat obrolan kapan saja melalui menu samping.
           </div>
         </div>
 
@@ -150,7 +143,60 @@ function PrivacyModal({
             className="web-privacy-modal-dismiss"
             onClick={onClose}
           >
-            Mengerti & Tutup
+            Tutup
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ConfirmClearModal({
+  open,
+  onConfirm,
+  onCancel,
+}: {
+  open: boolean
+  onConfirm: () => void
+  onCancel: () => void
+}) {
+  if (!open) return null
+
+  return (
+    <div
+      className="web-privacy-modal-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="clear-modal-title"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onCancel()
+      }}
+    >
+      <div className="web-confirm-modal">
+        <div className="web-confirm-modal-header">
+          <h2 className="web-confirm-modal-title" id="clear-modal-title">
+            Hapus Semua Riwayat?
+          </h2>
+        </div>
+        <div className="web-confirm-modal-body">
+          <p>
+            Semua riwayat percakapan akan dihapus dari peramban dan server. Tindakan ini tidak dapat dibatalkan.
+          </p>
+        </div>
+        <div className="web-confirm-modal-footer">
+          <button
+            type="button"
+            className="web-confirm-btn-cancel"
+            onClick={onCancel}
+          >
+            Batal
+          </button>
+          <button
+            type="button"
+            className="web-confirm-btn-danger"
+            onClick={onConfirm}
+          >
+            Hapus Semua
           </button>
         </div>
       </div>
@@ -374,70 +420,109 @@ function Conversation({
   )
   useEffect(() => {
     if (messages.length)
-      onSave({ id: conversation.id, messages, updatedAt: Date.now() })
-  }, [messages, conversation.id, onSave])
+      onSave({ id: conversation.id, messages, updatedAt: Date.now(), title: conversation.title })
+  }, [messages, conversation.id, conversation.title, onSave])
+
+  // Automatically scroll to bottom on new messages or loading states
+  useEffect(() => {
+    const el = conversationRef.current
+    if (el) {
+      el.scrollTop = el.scrollHeight
+    }
+  }, [messages, isAssistantLoading])
+
   const hasMessages = messages.length > 0
   return (
-    <div
-      ref={conversationRef}
-      className={`web-conversation ${hasMessages ? 'web-conversation-active' : 'web-conversation-home'}`}
-    >
+    <div className="web-chat-layout">
       {hasMessages ? (
-        <MessageList
-          messages={messages}
-          isAssistantLoading={isAssistantLoading}
-          onSendPrompt={handleSendMessage}
-        />
+        <>
+          <div className="web-scroll-area" ref={conversationRef}>
+            <div className="web-messages-wrapper">
+              <MessageList
+                messages={messages}
+                isAssistantLoading={isAssistantLoading}
+                onSendPrompt={handleSendMessage}
+              />
+            </div>
+          </div>
+          <div className="web-composer-wrapper">
+            <div className="web-composer">
+              {isSessionExpired ? (
+                <div className="flex flex-col items-center gap-2 w-full py-1">
+                  <button
+                    type="button"
+                    onClick={onResetSession}
+                    className="w-full py-3 px-4 rounded-full bg-[var(--idmc-color-primary-300)] text-[var(--idmc-color-neutral-100)] font-medium text-sm hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+                  >
+                    Mulai Sesi Baru
+                  </button>
+                </div>
+              ) : (
+                <ChatInput
+                  variant="chat"
+                  placeholder="Tanyakan sesuatu tentang data DIY..."
+                  onSubmit={handleSendMessage}
+                  submitDisabled={isAssistantLoading}
+                  autoFocus
+                />
+              )}
+              {!isSessionExpired && (
+                <p className="web-composer-note">
+                  Periksa kembali jawaban dengan sumber data terkait.
+                </p>
+              )}
+            </div>
+          </div>
+        </>
       ) : (
-        <div className="web-welcome">
-          <HeroTitle
-            title="Chatbot Data Publik"
-            tagline="Jelajahi Data, Kenali Yogyakarta."
-          />
-          <div className="web-privacy-banner">
-            <ShieldCheck size={16} className="text-[var(--idmc-color-primary-500)] flex-shrink-0" />
-            <span>Chatbot memproses pertanyaan publik secara anonim tanpa mencatat NIK atau identitas pribadi.</span>
-            {onOpenPrivacy && (
-              <button
-                type="button"
-                className="web-privacy-banner-link"
-                onClick={onOpenPrivacy}
-              >
-                Lihat Ketentuan
-              </button>
-            )}
+        <div className="web-scroll-area web-home-scroll-area" ref={conversationRef}>
+          <div className="web-home-container">
+            <div className="web-welcome">
+              <HeroTitle
+                title="Chatbot Data Publik"
+                tagline="Jelajahi Data, Kenali Yogyakarta."
+              />
+              <div className="web-privacy-banner">
+                <ShieldCheck size={16} className="text-[var(--idmc-color-primary-500)] flex-shrink-0" />
+                <span>Chatbot memproses pertanyaan publik secara anonim tanpa mencatat NIK atau identitas pribadi.</span>
+                {onOpenPrivacy && (
+                  <button
+                    type="button"
+                    className="web-privacy-banner-link"
+                    onClick={onOpenPrivacy}
+                  >
+                    Lihat Ketentuan
+                  </button>
+                )}
+              </div>
+            </div>
+            <div className="web-composer">
+              {isSessionExpired ? (
+                <div className="flex flex-col items-center gap-2 w-full py-1">
+                  <button
+                    type="button"
+                    onClick={onResetSession}
+                    className="w-full py-3 px-4 rounded-full bg-[var(--idmc-color-primary-300)] text-[var(--idmc-color-neutral-100)] font-medium text-sm hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+                  >
+                    Mulai Sesi Baru
+                  </button>
+                </div>
+              ) : (
+                <ChatInput
+                  variant="home"
+                  placeholder="Tanyakan sesuatu tentang data DIY..."
+                  onSubmit={handleSendMessage}
+                  submitDisabled={isAssistantLoading}
+                  autoFocus
+                />
+              )}
+              {!isSessionExpired && (
+                <SuggestionList items={suggestions} onSelect={handleSendMessage} />
+              )}
+            </div>
           </div>
         </div>
       )}
-      <div className="web-composer">
-        {isSessionExpired ? (
-          <div className="flex flex-col items-center gap-2 w-full py-1">
-            <button
-              type="button"
-              onClick={onResetSession}
-              className="w-full py-3 px-4 rounded-full bg-[var(--idmc-color-primary-300)] text-[var(--idmc-color-neutral-100)] font-medium text-sm hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
-            >
-              Mulai Sesi Baru
-            </button>
-          </div>
-        ) : (
-          <ChatInput
-            variant={hasMessages ? 'chat' : 'home'}
-            placeholder="Tanyakan sesuatu tentang data DIY..."
-            onSubmit={handleSendMessage}
-            submitDisabled={isAssistantLoading}
-            autoFocus
-          />
-        )}
-        {!hasMessages && !isSessionExpired && (
-          <SuggestionList items={suggestions} onSelect={handleSendMessage} />
-        )}
-        {hasMessages && !isSessionExpired && (
-          <p className="web-composer-note">
-            Periksa kembali jawaban dengan sumber data terkait.
-          </p>
-        )}
-      </div>
     </div>
   )
 }
@@ -446,6 +531,9 @@ function ChatWorkspace() {
   const [initial] = useState(initialConversation)
   const [active, setActive] = useState(initial.conversation)
   const [showPrivacyModal, setShowPrivacyModal] = useState(false)
+  const [showClearModal, setShowClearModal] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editTitle, setEditTitle] = useState('')
   const [records, setRecords] = useState<SavedConversation[]>(() => {
     try {
       return readConversations()
@@ -496,9 +584,9 @@ function ChatWorkspace() {
                 messages: [],
                 updatedAt: s.updatedAt ? new Date(s.updatedAt).getTime() : Date.now(),
                 title: s.title,
-              } as any)
-            } else if ((existing as any).title !== s.title && s.title) {
-              (existing as any).title = s.title
+              })
+            } else if (existing.title !== s.title && s.title) {
+              existing.title = s.title
             }
           }
           return merged.sort((a, b) => b.updatedAt - a.updatedAt)
@@ -545,7 +633,7 @@ function ChatWorkspace() {
               messages,
               updatedAt: detail.updatedAt ? new Date(detail.updatedAt).getTime() : Date.now(),
               title: detail.title,
-            } as any
+            }
             setRecords((prev) =>
               prev.map((r) => (r.id === detail.id ? hydrated : r)),
             )
@@ -582,6 +670,55 @@ function ChatWorkspace() {
     deleteSession(conversation.id).catch(() => {})
     if (active.id === conversation.id) select(newConversation())
   }
+
+  const clearAll = async () => {
+    setShowClearModal(false)
+    try {
+      const keysToRemove: string[] = []
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i)
+        if (key && key.startsWith(CONVERSATION_PREFIX)) {
+          keysToRemove.push(key)
+        }
+      }
+      keysToRemove.forEach((k) => localStorage.removeItem(k))
+    } catch {}
+
+    try {
+      await clearAllSessions()
+    } catch (err) {
+      console.warn('[IDMC Web] Gagal menghapus sesi server:', err)
+    }
+
+    setRecords([])
+    select(newConversation())
+  }
+
+  const handleSaveRename = (id: string, newTitle: string) => {
+    const trimmed = newTitle.trim()
+    setEditingId(null)
+    if (!trimmed) return
+
+    setRecords((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, title: trimmed } : r)),
+    )
+    if (active.id === id) {
+      setActive((prev) => ({ ...prev, title: trimmed }))
+    }
+    try {
+      const raw = localStorage.getItem(CONVERSATION_PREFIX + id)
+      if (raw) {
+        const parsed = JSON.parse(raw)
+        parsed.title = trimmed
+        localStorage.setItem(CONVERSATION_PREFIX + id, JSON.stringify(parsed))
+      }
+    } catch {}
+
+    renameSession(id, trimmed).catch((err) => {
+      console.warn('[IDMC Web] Gagal mengganti nama sesi di server:', err)
+    })
+  }
+
   return (
     <>
       <Sidebar>
@@ -610,7 +747,19 @@ function ChatWorkspace() {
           </button>
         </SidebarHeader>
         <SidebarContent>
-          <h2 className="web-history-label">Riwayat percakapan</h2>
+          <div className="web-history-header">
+            <h2 className="web-history-label">Riwayat percakapan</h2>
+            {records.length > 0 && (
+              <button
+                type="button"
+                className="web-clear-all-btn"
+                onClick={() => setShowClearModal(true)}
+                title="Hapus semua riwayat percakapan"
+              >
+                Hapus semua
+              </button>
+            )}
+          </div>
           {records.length === 0 && (
             <p className="web-empty-history">
               Percakapanmu akan muncul di sini.
@@ -619,22 +768,83 @@ function ChatWorkspace() {
           <SidebarMenu>
             {records.map((record) => (
               <SidebarMenuItem key={record.id}>
-                <SidebarMenuButton
-                  isActive={active.id === record.id}
-                  onClick={() => select(record)}
-                  title={conversationTitle(record)}
-                >
-                  <MessageSquare size={16} />
-                  <span>{conversationTitle(record)}</span>
-                </SidebarMenuButton>
-                <button
-                  type="button"
-                  className="web-delete-chat"
-                  aria-label={`Hapus percakapan ${conversationTitle(record)}`}
-                  onClick={() => remove(record)}
-                >
-                  <Trash2 size={15} />
-                </button>
+                {editingId === record.id ? (
+                  <div className="web-rename-form">
+                    <input
+                      type="text"
+                      className="web-rename-input"
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault()
+                          handleSaveRename(record.id, editTitle)
+                        } else if (e.key === 'Escape') {
+                          e.preventDefault()
+                          setEditingId(null)
+                        }
+                      }}
+                      autoFocus
+                      maxLength={100}
+                    />
+                    <button
+                      type="button"
+                      className="web-rename-action web-rename-save"
+                      aria-label="Simpan nama"
+                      title="Simpan"
+                      onClick={() => handleSaveRename(record.id, editTitle)}
+                    >
+                      <Check size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      className="web-rename-action web-rename-cancel"
+                      aria-label="Batal ubah nama"
+                      title="Batal"
+                      onClick={() => setEditingId(null)}
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <SidebarMenuButton
+                      isActive={active.id === record.id}
+                      onClick={() => select(record)}
+                      title={conversationTitle(record)}
+                    >
+                      <MessageSquare size={16} />
+                      <span>{conversationTitle(record)}</span>
+                    </SidebarMenuButton>
+                    <div className="web-history-actions">
+                      <button
+                        type="button"
+                        className="web-action-btn web-rename-chat"
+                        aria-label={`Ubah nama percakapan ${conversationTitle(record)}`}
+                        title="Ubah nama"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setEditingId(record.id)
+                          setEditTitle(conversationTitle(record))
+                        }}
+                      >
+                        <Pencil size={13} />
+                      </button>
+                      <button
+                        type="button"
+                        className="web-action-btn web-delete-chat"
+                        aria-label={`Hapus percakapan ${conversationTitle(record)}`}
+                        title="Hapus"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          remove(record)
+                        }}
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
+                  </>
+                )}
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
@@ -685,6 +895,11 @@ function ChatWorkspace() {
       <PrivacyModal
         open={showPrivacyModal}
         onClose={() => setShowPrivacyModal(false)}
+      />
+      <ConfirmClearModal
+        open={showClearModal}
+        onConfirm={clearAll}
+        onCancel={() => setShowClearModal(false)}
       />
     </>
   )

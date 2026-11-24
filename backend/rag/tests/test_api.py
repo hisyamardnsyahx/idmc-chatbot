@@ -186,3 +186,25 @@ def test_misconfigured_maps_to_500_with_code(tmp_path, monkeypatch):
     r = c.post("/api/chat", json={"message": "halo"})
     assert r.status_code == 500
     assert r.json()["code"] == "server_misconfigured"
+
+
+def test_api_session_rename_and_clear_all(tmp_path, monkeypatch):
+    c = _client(tmp_path, monkeypatch)
+    # create a session
+    s = app_mod.session_store.create_session("Percakapan Awal")
+    sid = s["id"]
+    # patch rename
+    res_patch = c.patch(f"/api/sessions/{sid}", json={"title": "Judul Baru"})
+    assert res_patch.status_code == 200
+    assert res_patch.json()["title"] == "Judul Baru"
+    # check detail
+    res_get = c.get(f"/api/sessions/{sid}")
+    assert res_get.status_code == 200
+    assert res_get.json()["title"] == "Judul Baru"
+    # test rename 404
+    assert c.patch("/api/sessions/nonexistent", json={"title": "Test"}).status_code == 404
+    # test delete all
+    res_clear = c.delete("/api/sessions")
+    assert res_clear.status_code == 200
+    assert res_clear.json()["cleared"] >= 1
+    assert c.get(f"/api/sessions/{sid}").status_code == 404

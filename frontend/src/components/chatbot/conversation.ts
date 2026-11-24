@@ -4,6 +4,7 @@ export interface SavedConversation {
   id: string
   messages: ChatMessage[]
   updatedAt: number
+  title?: string
 }
 
 export interface ConversationStore {
@@ -14,7 +15,7 @@ export interface ConversationStore {
 export const CONVERSATION_PREFIX = 'idmc-conversation-v1:'
 
 export function conversationTitle(conversation: SavedConversation) {
-  const customTitle = (conversation as any).title
+  const customTitle = conversation.title
   if (typeof customTitle === 'string' && customTitle.trim()) {
     return customTitle.trim()
   }
@@ -28,6 +29,7 @@ export function isConversation(value: unknown): value is SavedConversation {
     typeof record.id === 'string' &&
     /^[a-zA-Z0-9-]{1,80}$/.test(record.id) &&
     Number.isFinite(record.updatedAt) &&
+    (record.title === undefined || typeof record.title === 'string') &&
     Array.isArray(record.messages) &&
     record.messages.every(
       (message) =>

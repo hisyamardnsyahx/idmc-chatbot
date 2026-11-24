@@ -49,6 +49,23 @@ def test_append_missing_session_raises(tmp_path):
     raise AssertionError("expected ValueError")
 
 
+def test_session_rename_and_clear_all(tmp_path):
+    cfg = _cfg(tmp_path)
+    s1 = sessions.create_session("Initial Title 1", cfg=cfg)
+    s2 = sessions.create_session("Initial Title 2", cfg=cfg)
+    renamed = sessions.rename_session(s1["id"], "Judul Baru Percakapan", cfg=cfg)
+    assert renamed is not None
+    assert renamed["title"] == "Judul Baru Percakapan"
+    got = sessions.get_session(s1["id"], cfg=cfg)
+    assert got["title"] == "Judul Baru Percakapan"
+    # rename non-existent returns None
+    assert sessions.rename_session("nonexistent", "Title", cfg=cfg) is None
+    # clear all
+    cleared_count = sessions.clear_all_sessions(cfg=cfg)
+    assert cleared_count == 2
+    assert len(sessions.list_sessions(cfg=cfg)) == 0
+
+
 def test_path_traversal_session_lookup_prevented(tmp_path):
     cfg = _cfg(tmp_path)
     traversal_input = "../../../../frontend/package"

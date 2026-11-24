@@ -104,6 +104,35 @@ def delete_session(session_id: str, cfg: Settings | None = None) -> bool:
     return False
 
 
+def rename_session(
+    session_id: str,
+    new_title: str,
+    cfg: Settings | None = None,
+) -> dict[str, Any] | None:
+    cfg = cfg or settings
+    session = get_session(session_id, cfg)
+    if session is None:
+        return None
+    cleaned = new_title.strip()[:100]
+    session["title"] = cleaned if cleaned else "Percakapan"
+    session["updated_at"] = _now()
+    atomic_write_json(_path(cfg, session_id), session)
+    return session
+
+
+def clear_all_sessions(cfg: Settings | None = None) -> int:
+    cfg = cfg or settings
+    cfg.sessions_dir.mkdir(parents=True, exist_ok=True)
+    count = 0
+    for f in cfg.sessions_dir.glob("*.json"):
+        try:
+            f.unlink()
+            count += 1
+        except OSError:
+            pass
+    return count
+
+
 def history_for_model(
     session: dict[str, Any], cfg: Settings | None = None, limit: int | None = None
 ) -> list[dict[str, str]]:

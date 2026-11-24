@@ -84,3 +84,23 @@ export async function deleteSession(sessionId: string): Promise<void> {
     { method: 'DELETE' },
   )
 }
+
+export async function renameSession(
+  sessionId: string,
+  title: string,
+): Promise<{ id: string; title: string }> {
+  return await requestJson<{ id: string; title: string }>(
+    `/api/sessions/${encodeURIComponent(sessionId)}`,
+    {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title }),
+    },
+  )
+}
+
+export async function clearAllSessions(): Promise<{ cleared: number }> {
+  return await requestJson<{ cleared: number }>('/api/sessions', {
+    method: 'DELETE',
+  })
+}

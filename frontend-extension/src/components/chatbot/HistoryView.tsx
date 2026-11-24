@@ -108,6 +108,11 @@ export function HistoryView({
           </ul>
         </div>
       )}
+      <div className="p-3 border-t border-[var(--idmc-color-neutral-300)] bg-[var(--idmc-color-neutral-100)] text-center">
+        <p className="text-[11px] text-[var(--idmc-color-neutral-600)] leading-tight m-0">
+          Riwayat sesi disimpan secara anonim berdasarkan ID sesi tanpa merekam identitas pengguna.
+        </p>
+      </div>
     </section>
   )
 }

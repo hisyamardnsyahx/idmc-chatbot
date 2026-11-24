@@ -14,6 +14,10 @@ export interface ConversationStore {
 export const CONVERSATION_PREFIX = 'idmc-conversation-v1:'
 
 export function conversationTitle(conversation: SavedConversation) {
+  const customTitle = (conversation as any).title
+  if (typeof customTitle === 'string' && customTitle.trim()) {
+    return customTitle.trim()
+  }
   return conversation.messages.find((message) => message.role === 'user')?.text || 'Chat baru'
 }
 

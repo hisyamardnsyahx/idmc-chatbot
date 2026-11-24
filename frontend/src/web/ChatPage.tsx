@@ -1,5 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { ArrowUpRight, MessageSquare, Plus, Trash2 } from 'lucide-react'
+import {
+  ArrowUpRight,
+  CheckCircle2,
+  MessageSquare,
+  Plus,
+  ShieldCheck,
+  Trash2,
+  X,
+  XCircle,
+} from 'lucide-react'
 import idmcIcon from '../assets/figma/idmc-logo.svg'
 import {
   Sidebar,
@@ -21,6 +30,7 @@ import { widgetClasses } from '../components/chatbot/layout'
 import { useChatSession } from '../components/chatbot/useChatSession'
 import { conversationTitle, newConversation } from '../components/chatbot/conversation'
 import type { SavedConversation } from '../components/chatbot/conversation'
+import type { ChatMessage } from '../components/chatbot/types'
 import {
   INACTIVITY_INSIGHT_MS,
   SESSION_TIMEOUT_MS,
@@ -36,6 +46,7 @@ import {
   initialConversation,
   readConversations,
 } from './conversationStorage'
+import { deleteSession, getSession, listSessions } from '../api/sessionsApi'
 
 const suggestions = [
   'Berapa jumlah sentra industri kecil dan menengah (IKM) di DIY?',
@@ -44,18 +55,125 @@ const suggestions = [
   'Dashboard Koperasi',
 ]
 
+function PrivacyModal({
+  open,
+  onClose,
+}: {
+  open: boolean
+  onClose: () => void
+}) {
+  if (!open) return null
+
+  return (
+    <div
+      className="web-privacy-modal-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="privacy-modal-title"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose()
+      }}
+    >
+      <div className="web-privacy-modal">
+        <div className="web-privacy-modal-header">
+          <div>
+            <div className="web-privacy-modal-title" id="privacy-modal-title">
+              <ShieldCheck size={22} className="text-[var(--idmc-color-primary-500)]" />
+              <span>Transparansi & Kebijakan Data</span>
+            </div>
+            <p className="web-privacy-modal-subtitle">
+              Kepatuhan UU No. 27 Tahun 2022 tentang Pelindungan Data Pribadi (PDP)
+            </p>
+          </div>
+          <button
+            type="button"
+            className="web-privacy-modal-close"
+            onClick={onClose}
+            aria-label="Tutup kebijakan privasi"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className="web-privacy-modal-body">
+          <div className="web-privacy-grid">
+            <div className="web-privacy-card web-privacy-card-recorded">
+              <div className="web-privacy-card-header">
+                <CheckCircle2 size={18} />
+                <span>Data yang DICATAT</span>
+              </div>
+              <ul className="web-privacy-list">
+                <li>
+                  <span>• <strong>Pertanyaan & Jawaban:</strong> Diproses secara anonim untuk penjawaban data agregat daerah.</span>
+                </li>
+                <li>
+                  <span>• <strong>ID Sesi Anonim:</strong> Token sesi acak sementara untuk mengelompokkan percakapan saat aktif.</span>
+                </li>
+                <li>
+                  <span>• <strong>Waktu Interaksi:</strong> Stempel waktu (timestamp) untuk mengurutkan riwayat percakapan.</span>
+                </li>
+                <li>
+                  <span>• <strong>Riwayat Browser:</strong> Disimpan di peramban Anda (localStorage) agar Anda dapat melanjutkannya.</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="web-privacy-card web-privacy-card-not-recorded">
+              <div className="web-privacy-card-header">
+                <XCircle size={18} />
+                <span>Data yang TIDAK Dicatat</span>
+              </div>
+              <ul className="web-privacy-list">
+                <li>
+                  <span>• <strong>Identitas Pribadi (PII):</strong> Nama lengkap, NIK, alamat rumah, nomor HP, atau email.</span>
+                </li>
+                <li>
+                  <span>• <strong>Kredensial & Sandi:</strong> Password, kata sandi, atau token autentikasi akun IDMC.</span>
+                </li>
+                <li>
+                  <span>• <strong>Lokasi Presisi:</strong> Koordinat GPS perangkat atau pelacakan IP address perorangan.</span>
+                </li>
+                <li>
+                  <span>• <strong>Aktivitas Web Lain:</strong> Riwayat penjelajahan tab atau situs lain di luar chatbot IDMC.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="web-privacy-legal">
+            <strong>Prinsip Minimasi Data:</strong> Layanan chatbot IDMC Pemda DIY beroperasi secara tertutup pada basis pengetahuan agregat data publik (RAG). Tidak ada profil pengguna perorangan yang dibentuk atau diperjualbelikan.
+          </div>
+        </div>
+
+        <div className="web-privacy-modal-footer">
+          <button
+            type="button"
+            className="web-privacy-modal-dismiss"
+            onClick={onClose}
+          >
+            Mengerti & Tutup
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function Conversation({
   conversation,
   onSave,
   onResetSession,
+  onOpenPrivacy,
 }: {
   conversation: SavedConversation
   onSave: (conversation: SavedConversation) => void
   onResetSession?: () => void
+  onOpenPrivacy?: () => void
 }) {
   const { messages, isAssistantLoading, sendMessage, appendMessage } = useChatSession(
     undefined,
     conversation.messages,
+    conversation.id,
   )
   const [isSessionExpired, setIsSessionExpired] = useState(false)
   const isSessionExpiredRef = useRef(false)
@@ -273,6 +391,19 @@ function Conversation({
             title="Chatbot Data Publik"
             tagline="Jelajahi Data, Kenali Yogyakarta."
           />
+          <div className="web-privacy-banner">
+            <ShieldCheck size={16} className="text-[var(--idmc-color-primary-500)] flex-shrink-0" />
+            <span>Chatbot memproses pertanyaan publik secara anonim tanpa mencatat NIK atau identitas pribadi.</span>
+            {onOpenPrivacy && (
+              <button
+                type="button"
+                className="web-privacy-banner-link"
+                onClick={onOpenPrivacy}
+              >
+                Lihat Ketentuan
+              </button>
+            )}
+          </div>
         </div>
       )}
       <div className="web-composer">
@@ -311,6 +442,7 @@ function Conversation({
 function ChatWorkspace() {
   const [initial] = useState(initialConversation)
   const [active, setActive] = useState(initial.conversation)
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false)
   const [records, setRecords] = useState<SavedConversation[]>(() => {
     try {
       return readConversations()
@@ -321,6 +453,7 @@ function ChatWorkspace() {
   const [notice, setNotice] = useState(initial.error ?? '')
   const deletedIds = useRef(new Set<string>())
   const { setOpenMobile } = useSidebar()
+
   useEffect(() => {
     if (window.location.hash.startsWith('#conversation=')) {
       window.history.replaceState(
@@ -341,6 +474,38 @@ function ChatWorkspace() {
     window.addEventListener('storage', refresh)
     return () => window.removeEventListener('storage', refresh)
   }, [])
+
+  // Synchronize history with backend sessions
+  useEffect(() => {
+    listSessions()
+      .then((backendSessions) => {
+        if (!Array.isArray(backendSessions) || backendSessions.length === 0) return
+        setRecords((prev) => {
+          const map = new Map<string, SavedConversation>()
+          prev.forEach((r) => map.set(r.id, r))
+          const merged: SavedConversation[] = [...prev]
+          for (const s of backendSessions) {
+            if (deletedIds.current.has(s.id)) continue
+            const existing = map.get(s.id)
+            if (!existing) {
+              merged.push({
+                id: s.id,
+                messages: [],
+                updatedAt: s.updatedAt ? new Date(s.updatedAt).getTime() : Date.now(),
+                title: s.title,
+              } as any)
+            } else if ((existing as any).title !== s.title && s.title) {
+              (existing as any).title = s.title
+            }
+          }
+          return merged.sort((a, b) => b.updatedAt - a.updatedAt)
+        })
+      })
+      .catch((err) => {
+        console.warn('[IDMC Web] Gagal menyinkronkan riwayat dari backend:', err)
+      })
+  }, [])
+
   const save = useCallback((conversation: SavedConversation) => {
     if (deletedIds.current.has(conversation.id)) return
     setRecords((previous) => [
@@ -358,11 +523,48 @@ function ChatWorkspace() {
       )
     }
   }, [])
+
   const select = (conversation: SavedConversation) => {
     // Ignore selecting the current row so pending requests keep their lifecycle.
-    if (conversation.id !== active.id) setActive(conversation)
+    if (conversation.id !== active.id) {
+      if (conversation.messages.length === 0) {
+        // Hydrate from backend session
+        getSession(conversation.id)
+          .then((detail) => {
+            const messages: ChatMessage[] = detail.turns.map((t, idx) => ({
+              id: `${detail.id}-turn-${idx}`,
+              role: t.role,
+              text: t.text,
+              sources: t.sources,
+            }))
+            const hydrated: SavedConversation = {
+              id: detail.id,
+              messages,
+              updatedAt: detail.updatedAt ? new Date(detail.updatedAt).getTime() : Date.now(),
+              title: detail.title,
+            } as any
+            setRecords((prev) =>
+              prev.map((r) => (r.id === detail.id ? hydrated : r)),
+            )
+            try {
+              localStorage.setItem(
+                CONVERSATION_PREFIX + detail.id,
+                JSON.stringify(hydrated),
+              )
+            } catch {}
+            setActive(hydrated)
+          })
+          .catch(() => {
+            setNotice('Gagal memuat percakapan dari server. Membuka percakapan kosong.')
+            setActive(conversation)
+          })
+      } else {
+        setActive(conversation)
+      }
+    }
     setOpenMobile(false)
   }
+
   const remove = (conversation: SavedConversation) => {
     try {
       localStorage.removeItem(CONVERSATION_PREFIX + conversation.id)
@@ -374,6 +576,7 @@ function ChatWorkspace() {
     setRecords((previous) =>
       previous.filter((item) => item.id !== conversation.id),
     )
+    deleteSession(conversation.id).catch(() => {})
     if (active.id === conversation.id) select(newConversation())
   }
   return (
@@ -434,8 +637,16 @@ function ChatWorkspace() {
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
+          <button
+            type="button"
+            className="web-privacy-btn"
+            onClick={() => setShowPrivacyModal(true)}
+          >
+            <ShieldCheck size={16} />
+            <span>Privasi & Transparansi Data</span>
+          </button>
           <span className="web-local-note">
-            Riwayat tersimpan di browser ini
+            Riwayat tersinkronisasi otomatis
           </span>
           <a
             href="https://idmc.jogjaprov.go.id/"
@@ -465,8 +676,13 @@ function ChatWorkspace() {
           conversation={active}
           onSave={save}
           onResetSession={() => select(newConversation())}
+          onOpenPrivacy={() => setShowPrivacyModal(true)}
         />
       </main>
+      <PrivacyModal
+        open={showPrivacyModal}
+        onClose={() => setShowPrivacyModal(false)}
+      />
     </>
   )
 }

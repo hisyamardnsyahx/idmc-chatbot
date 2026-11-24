@@ -17,9 +17,10 @@ const CHAT_ERROR_MESSAGE =
 export function useChatSession(
   _requestReply?: unknown,
   initialMessages: ChatMessage[] = [],
+  initialSessionId?: string | null,
 ) {
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages)
-  const [sessionId, setSessionId] = useState<string | null>(null)
+  const [sessionId, setSessionId] = useState<string | null>(initialSessionId ?? null)
   const [isAssistantLoading, setIsAssistantLoading] = useState(false)
   const [isHydrating, setIsHydrating] = useState(false)
   const nextMessageId = useRef(0)

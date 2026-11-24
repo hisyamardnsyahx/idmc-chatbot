@@ -10,7 +10,7 @@ import { HomeView } from './HomeView'
 import type { ChatHistoryItem, ChatUser } from './types'
 import { useChatSession } from './useChatSession'
 import type { ChatTransport } from '../../api/chatTransport'
-import { expandedChatUrl, newConversation } from './conversation'
+import { expandedChatUrl } from './conversation'
 import type { ConversationStore } from './conversation'
 import { DYNAMIC_INSIGHTS_POOL, formatInsightMessage } from './insights'
 import type { DynamicInsight } from './insights'
@@ -88,6 +88,7 @@ export function ChatOverlay({
   const [isSessionExpired, setIsSessionExpired] = useState(false)
   const {
     messages,
+    sessionId,
     isAssistantLoading,
     isHydrating,
     sendMessage,
@@ -109,8 +110,13 @@ export function ChatOverlay({
   const maximize = targetExpandedUrl
     ? () => {
         try {
+          const convId = sessionId || crypto.randomUUID()
           window.open(
-            expandedChatUrl(targetExpandedUrl, newConversation(messages)),
+            expandedChatUrl(targetExpandedUrl, {
+              id: convId,
+              messages,
+              updatedAt: Date.now(),
+            }),
             '_blank',
             'noopener,noreferrer',
           )

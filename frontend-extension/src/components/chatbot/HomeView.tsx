@@ -57,6 +57,9 @@ export function HomeView({
         <SuggestionList items={suggestions} onSelect={onSelectSuggestion} />
 
         <ChatInput variant="home" placeholder="Tanyakan sesuatu..." onSubmit={onSubmit} />
+        <p className="text-[11px] text-center text-[var(--idmc-color-neutral-500)] mt-1.5 leading-tight select-none">
+          Pertanyaan diproses secara anonim. Tidak ada data pribadi (PII/NIK) yang dicatat.
+        </p>
       </div>
     </section>
   )

@@ -50,7 +50,7 @@ const OPEN_SESSION_ERROR = 'Percakapan tidak bisa dibuka. Coba lagi.'
 
 const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-import { expandedChatUrl, newConversation, type ConversationStore } from './conversation'
+import { expandedChatUrl, type ConversationStore } from './conversation'
 
 export interface ChatOverlayProps {
   user: ChatUser
@@ -84,6 +84,7 @@ export function ChatOverlay({
   const [isSessionExpired, setIsSessionExpired] = useState(false)
   const {
     messages,
+    sessionId,
     isAssistantLoading,
     isHydrating,
     sendMessage,
@@ -100,8 +101,13 @@ export function ChatOverlay({
   const maximize = expandedUrl
     ? () => {
         try {
+          const convId = sessionId || crypto.randomUUID()
           window.open(
-            expandedChatUrl(expandedUrl, newConversation(messages)),
+            expandedChatUrl(expandedUrl, {
+              id: convId,
+              messages,
+              updatedAt: Date.now(),
+            }),
             '_blank',
             'noopener,noreferrer',
           )

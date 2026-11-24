@@ -15,8 +15,11 @@ const CHAT_ERROR_MESSAGE =
  * backend can persist history. Closing the overlay resets the local view; the
  * server-side session remains available from the History view.
  */
-export function useChatSession(requestReply: ChatTransport = sendChatMessage) {
-  const [messages, setMessages] = useState<ChatMessage[]>([])
+export function useChatSession(
+  requestReply: ChatTransport = sendChatMessage,
+  initialMessages: ChatMessage[] = [],
+) {
+  const [messages, setMessages] = useState<ChatMessage[]>(initialMessages)
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [isAssistantLoading, setIsAssistantLoading] = useState(false)
   const [isHydrating, setIsHydrating] = useState(false)

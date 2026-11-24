@@ -11,6 +11,7 @@ import type { ChatHistoryItem, ChatUser } from './types'
 import { useChatSession } from './useChatSession'
 import type { ChatTransport } from '../../api/chatTransport'
 import { expandedChatUrl, newConversation } from './conversation'
+import type { ConversationStore } from './conversation'
 import { DYNAMIC_INSIGHTS_POOL, formatInsightMessage } from './insights'
 import type { DynamicInsight } from './insights'
 import { getLocalSessionSummaries, clearLocalSessions } from './localHistory'
@@ -64,6 +65,7 @@ export interface ChatOverlayProps {
   requestReply?: ChatTransport
   /** Preview defaults to true; the extension passes true. */
   historyEnabled?: boolean
+  conversationStore?: ConversationStore
   expandedUrl?: string
 }
 

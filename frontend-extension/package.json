@@ -15,9 +15,11 @@
     "test": "node --test --test-concurrency=1 scripts/ui.test.mjs scripts/extension.test.mjs",
     "test:browser": "node --test scripts/browser.test.mjs",
     "preview:web": "vite preview",
+    "test:web": "node --test scripts/web.test.mjs",
     "postinstall": "wxt prepare"
   },
   "dependencies": {
+    "@base-ui/react": "^1.9.0",
     "@fontsource/plus-jakarta-sans": "5.3.0",
     "clsx": "2.1.1",
     "lucide-react": "^1.78.0",

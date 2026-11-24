@@ -1,24 +1,22 @@
-import { cn } from './lib/utils'
 import { ChatOverlay } from './components/chatbot'
-import type { ChatUser } from './components/chatbot'
+import { ChatPage } from './web/ChatPage'
+import { previewConversationStore } from './web/conversationStorage'
 
-// Static sample data for the local host page only.
-const user: ChatUser = { name: 'User', role: 'Pengguna' }
-
-const suggestions = ['Dashboard Koperasi', 'Dashboard Koperasi', 'Dashboard Koperasi']
-
-// Empty host page standing in for the dashboard the widget will float over.
-function App() {
-  return (
-    <div
-      className={cn(
-        'idmc-host',
-        '[min-block-size:100vh] [background:var(--idmc-color-neutral-300)]',
-      )}
-    >
-      <ChatOverlay user={user} suggestions={suggestions} />
-    </div>
-  )
+export default function App() {
+  if (new URLSearchParams(window.location.search).get('view') === 'overlay') {
+    return (
+      <ChatOverlay
+        user={{ name: 'User', role: 'Pengguna' }}
+        suggestions={[
+          'Berapa jumlah sentra industri kecil dan menengah (IKM) di DIY?',
+          'Data penduduk DIY',
+          'Statistik pendidikan',
+          'Dashboard Koperasi',
+        ]}
+        conversationStore={previewConversationStore}
+        expandedUrl={new URL('.', window.location.href).href}
+      />
+    )
+  }
+  return <ChatPage />
 }
-
-export default App

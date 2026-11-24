@@ -50,6 +50,8 @@ const OPEN_SESSION_ERROR = 'Percakapan tidak bisa dibuka. Coba lagi.'
 
 const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
+import type { ConversationStore } from './conversation'
+
 export interface ChatOverlayProps {
   user: ChatUser
   suggestions: string[]
@@ -60,6 +62,8 @@ export interface ChatOverlayProps {
   historyItems?: ChatHistoryItem[]
   /** Preview defaults to true; the extension passes false. */
   historyEnabled?: boolean
+  conversationStore?: ConversationStore
+  expandedUrl?: string
 }
 
 /**

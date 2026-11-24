@@ -10,6 +10,7 @@ import { HomeView } from './HomeView'
 import type { ChatHistoryItem, ChatUser } from './types'
 import { useChatSession } from './useChatSession'
 import type { ChatTransport } from '../../api/chatTransport'
+import { expandedChatUrl, newConversation } from './conversation'
 import { DYNAMIC_INSIGHTS_POOL, formatInsightMessage } from './insights'
 import type { DynamicInsight } from './insights'
 import { getLocalSessionSummaries, clearLocalSessions } from './localHistory'
@@ -63,6 +64,7 @@ export interface ChatOverlayProps {
   requestReply?: ChatTransport
   /** Preview defaults to true; the extension passes true. */
   historyEnabled?: boolean
+  expandedUrl?: string
 }
 
 /**
@@ -77,6 +79,7 @@ export function ChatOverlay({
   historyItems: historyItemsProp,
   requestReply,
   historyEnabled = true,
+  expandedUrl,
 }: ChatOverlayProps) {
   const [phase, setPhase] = useState<OverlayPhase>('closed')
   const [view, setView] = useState<ChatView>('home')
@@ -94,6 +97,27 @@ export function ChatOverlay({
   const [historyItems, setHistoryItems] = useState<ChatHistoryItem[]>(historyItemsProp ?? [])
   const [historyLoading, setHistoryLoading] = useState(false)
   const [historyError, setHistoryError] = useState<string | null>(null)
+  const [expandError, setExpandError] = useState('')
+
+  const targetExpandedUrl =
+    expandedUrl ||
+    (typeof window !== 'undefined' && (window as any).__IDMC_WEB_URL__) ||
+    'http://localhost:5173/'
+
+  const maximize = targetExpandedUrl
+    ? () => {
+        try {
+          window.open(
+            expandedChatUrl(targetExpandedUrl, newConversation(messages)),
+            '_blank',
+            'noopener,noreferrer',
+          )
+          setExpandError('')
+        } catch (error) {
+          setExpandError(error instanceof Error ? error.message : 'Tab baru gagal dibuka.')
+        }
+      }
+    : undefined
 
   const panelRef = useRef<HTMLDivElement>(null)
   const launcherRef = useRef<HTMLButtonElement>(null)
@@ -471,6 +495,8 @@ export function ChatOverlay({
               onSubmit={startConversation}
               onSelectSuggestion={startConversation}
               onOpenHistory={historyEnabled ? openHistory : undefined}
+              onMaximize={maximize}
+              maximizeDisabled={isAssistantLoading}
               onClose={requestClose}
             />
           )}
@@ -481,6 +507,8 @@ export function ChatOverlay({
               isAssistantLoading={isAssistantLoading || isHydrating}
               onSend={handleSendMessage}
               onOpenHistory={historyEnabled ? openHistory : undefined}
+              onMaximize={maximize}
+              maximizeDisabled={isAssistantLoading}
               onClose={requestClose}
               isSessionExpired={isSessionExpired}
               onResetSession={handleStartFreshSession}
@@ -492,11 +520,18 @@ export function ChatOverlay({
               selectedId={selectedHistoryId}
               onSelect={handleSelectHistory}
               onBack={closeHistory}
+              onMaximize={maximize}
+              maximizeDisabled={isAssistantLoading}
               onClose={requestClose}
               isLoading={historyLoading}
               error={historyError}
               onClearHistory={handleClearHistory}
             />
+          )}
+          {expandError && (
+            <div role="alert" className="absolute bottom-0 inset-x-0 bg-white p-3 text-sm text-[var(--idmc-color-primary-500)] shadow">
+              {expandError}
+            </div>
           )}
         </div>
       )}

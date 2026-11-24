@@ -1,4 +1,4 @@
-import { Maximize2 } from 'lucide-react'
+import { Square } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import type { ReactNode } from 'react'
 import closeIconSrc from '../../assets/icon-close.svg'
@@ -87,7 +87,7 @@ export function TopBarActions({ onOpenHistory, onClose, onMaximize, maximizeDisa
           onClick={onMaximize}
           className="idmc-maximize inline-flex items-center justify-center [width:30px] [height:30px] [padding:0] [border:1px_solid_var(--idmc-color-neutral-300)] rounded-full bg-white [color:var(--idmc-color-primary-500)] cursor-pointer disabled:opacity-40 disabled:cursor-wait hover:[background:var(--idmc-color-primary-10-a10)] focus-visible:[outline:2px_solid_var(--idmc-color-primary-300)]"
         >
-          <Maximize2 size={17} />
+          <Square size={14} strokeWidth={2.2} />
         </button>
       )}
       {onOpenHistory && (

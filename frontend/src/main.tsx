@@ -3,6 +3,9 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import './preview.css'
 import './web/web.css'
+import '@fontsource/plus-jakarta-sans/400.css'
+import '@fontsource/plus-jakarta-sans/500.css'
+import '@fontsource/plus-jakarta-sans/700.css'
 import App from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(

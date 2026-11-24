@@ -13,6 +13,8 @@ export interface HistoryViewProps {
   selectedId?: string | null
   onSelect?: (id: string) => void
   onBack: () => void
+  onMaximize?: () => void
+  maximizeDisabled?: boolean
   onClose?: () => void
   isLoading?: boolean
   error?: string | null
@@ -26,6 +28,8 @@ export function HistoryView({
   selectedId,
   onSelect,
   onBack,
+  onMaximize,
+  maximizeDisabled,
   onClose,
   isLoading = false,
   error = null,
@@ -39,7 +43,13 @@ export function HistoryView({
       aria-label="Riwayat chat"
       aria-busy={isLoading}
     >
-      <ChatHeader title="Riwayat Chat" onBack={onBack} onClose={onClose} />
+      <ChatHeader
+        title="Riwayat Chat"
+        onBack={onBack}
+        onClose={onClose}
+        onMaximize={onMaximize}
+        maximizeDisabled={maximizeDisabled}
+      />
 
       {isLoading ? (
         <EmptyState message="Memuat riwayat..." />

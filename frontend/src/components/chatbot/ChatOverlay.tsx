@@ -50,7 +50,7 @@ const OPEN_SESSION_ERROR = 'Percakapan tidak bisa dibuka. Coba lagi.'
 
 const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-import type { ConversationStore } from './conversation'
+import { expandedChatUrl, newConversation, type ConversationStore } from './conversation'
 
 export interface ChatOverlayProps {
   user: ChatUser
@@ -77,6 +77,7 @@ export function ChatOverlay({
   suggestions,
   historyItems: historyItemsProp,
   historyEnabled = true,
+  expandedUrl,
 }: ChatOverlayProps) {
   const [phase, setPhase] = useState<OverlayPhase>('closed')
   const [view, setView] = useState<ChatView>('home')
@@ -94,6 +95,22 @@ export function ChatOverlay({
   const [historyItems, setHistoryItems] = useState<ChatHistoryItem[]>(historyItemsProp ?? [])
   const [historyLoading, setHistoryLoading] = useState(false)
   const [historyError, setHistoryError] = useState<string | null>(null)
+  const [expandError, setExpandError] = useState('')
+
+  const maximize = expandedUrl
+    ? () => {
+        try {
+          window.open(
+            expandedChatUrl(expandedUrl, newConversation(messages)),
+            '_blank',
+            'noopener,noreferrer',
+          )
+          setExpandError('')
+        } catch (error) {
+          setExpandError(error instanceof Error ? error.message : 'Tab baru gagal dibuka.')
+        }
+      }
+    : undefined
 
   const panelRef = useRef<HTMLDivElement>(null)
   const launcherRef = useRef<HTMLButtonElement>(null)
@@ -471,6 +488,8 @@ export function ChatOverlay({
               onSubmit={startConversation}
               onSelectSuggestion={startConversation}
               onOpenHistory={historyEnabled ? openHistory : undefined}
+              onMaximize={maximize}
+              maximizeDisabled={isAssistantLoading}
               onClose={requestClose}
             />
           )}
@@ -481,6 +500,8 @@ export function ChatOverlay({
               isAssistantLoading={isAssistantLoading || isHydrating}
               onSend={handleSendMessage}
               onOpenHistory={historyEnabled ? openHistory : undefined}
+              onMaximize={maximize}
+              maximizeDisabled={isAssistantLoading}
               onClose={requestClose}
               isSessionExpired={isSessionExpired}
               onResetSession={handleStartFreshSession}
@@ -492,11 +513,18 @@ export function ChatOverlay({
               selectedId={selectedHistoryId}
               onSelect={handleSelectHistory}
               onBack={closeHistory}
+              onMaximize={maximize}
+              maximizeDisabled={isAssistantLoading}
               onClose={requestClose}
               isLoading={historyLoading}
               error={historyError}
               onClearHistory={handleClearHistory}
             />
+          )}
+          {expandError && (
+            <div role="alert" className="absolute bottom-0 inset-x-0 bg-white p-3 text-sm text-[var(--idmc-color-primary-500)] shadow">
+              {expandError}
+            </div>
           )}
         </div>
       )}

@@ -9,9 +9,9 @@ export default function App() {
         user={{ name: 'User', role: 'Pengguna' }}
         suggestions={[
           'Berapa jumlah sentra industri kecil dan menengah (IKM) di DIY?',
-          'Data penduduk DIY',
-          'Statistik pendidikan',
-          'Dashboard Koperasi',
+          'Volume kendaraan CCTV perbatasan kota',
+          'Data kepegawaian ASN berdasarkan pendidikan',
+          'Peta rencana arsitektur SPBE DIY',
         ]}
         conversationStore={previewConversationStore}
         expandedUrl={new URL('.', window.location.href).href}

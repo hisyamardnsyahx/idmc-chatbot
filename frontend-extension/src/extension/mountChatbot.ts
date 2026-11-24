@@ -11,7 +11,11 @@ export function mountChatbot(container: HTMLElement) {
   const root = createRoot(app)
   root.render(createElement(ChatOverlay, {
     user: { name: 'User', role: 'Pengguna' },
-    suggestions: ['Dashboard Koperasi', 'Data penduduk DIY', 'Statistik pendidikan'],
+    suggestions: [
+      'Berapa jumlah sentra industri kecil dan menengah (IKM) di DIY?',
+      'Volume kendaraan CCTV perbatasan kota',
+      'Data kepegawaian ASN berdasarkan pendidikan',
+    ],
     requestReply: sendExtensionChatMessage,
     historyEnabled: true,
   }))

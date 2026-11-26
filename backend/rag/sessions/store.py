@@ -28,9 +28,14 @@ def _path(cfg: Settings, session_id: str) -> Path:
     return target
 
 
-def create_session(title: str = "New chat", cfg: Settings | None = None) -> dict[str, Any]:
+def create_session(
+    title: str = "New chat",
+    cfg: Settings | None = None,
+    session_id: str | None = None,
+) -> dict[str, Any]:
     cfg = cfg or settings
-    session_id = uuid.uuid4().hex[:12]
+    if not session_id or not isinstance(session_id, str) or not SESSION_ID_RE.match(session_id):
+        session_id = uuid.uuid4().hex[:12]
     session = {
         "id": session_id,
         "title": title,

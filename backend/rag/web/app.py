@@ -174,7 +174,7 @@ def api_chat(req: schemas.ChatRequest) -> schemas.ChatResponse:
     if req.session_id:
         session = session_store.get_session(req.session_id)
         if session is None:
-            raise HTTPException(status_code=404, detail="session not found")
+            session = session_store.create_session(session_id=req.session_id)
     else:
         session = session_store.create_session()
     history = session_store.history_for_model(session)

@@ -56,7 +56,8 @@ import {
 } from './conversationStorage'
 import { clearAllSessions, deleteSession, getSession, listSessions, renameSession } from '../api/sessionsApi'
 import { sendChatMessage } from '../api/chatApi'
-import { ChatServiceUnavailableError } from '../api/chatTransport'
+import { ChatServiceUnavailableError, ChatSessionNotFoundError } from '../api/chatTransport'
+import type { ChatReply } from '../api/types'
 
 const suggestions = [
   'Berapa jumlah sentra industri kecil dan menengah (IKM) di DIY?',
@@ -699,10 +700,28 @@ function ChatWorkspace() {
       const controller = new AbortController()
       controllersRef.current.set(convId, controller)
 
-      sendChatMessage(trimmed, {
-        sessionId: convId,
-        signal: controller.signal,
-      })
+      const doSend = async (): Promise<ChatReply> => {
+        try {
+          return await sendChatMessage(trimmed, {
+            sessionId: convId,
+            signal: controller.signal,
+          })
+        } catch (error) {
+          const isNotFound =
+            (typeof ChatSessionNotFoundError !== 'undefined' &&
+              error instanceof ChatSessionNotFoundError) ||
+            (error as any)?.status === 404 ||
+            (error as any)?.code === 'session_not_found'
+          if (isNotFound) {
+            return await sendChatMessage(trimmed, {
+              signal: controller.signal,
+            })
+          }
+          throw error
+        }
+      }
+
+      doSend()
         .then((reply) => {
           if (deletedIds.current.has(convId)) return
 

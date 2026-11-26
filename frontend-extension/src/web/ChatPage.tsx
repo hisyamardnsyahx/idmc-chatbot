@@ -1,7 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   ArrowUpRight,
+  BookOpen,
   Check,
+  Clock,
+  Database,
+  HardDrive,
+  Lock,
+  MapPinOff,
   MessageSquare,
   Pencil,
   Plus,
@@ -54,6 +60,33 @@ const suggestions = [
   'Dashboard Koperasi',
 ]
 
+const PRIVACY_COMMITMENTS = [
+  {
+    icon: Database,
+    text: 'Pertanyaan Anda hanya digunakan untuk mencari data agregat dan statistik daerah dari dashboard resmi Pemda DIY.',
+  },
+  {
+    icon: MapPinOff,
+    text: 'Sistem tidak melacak koordinat GPS perangkat maupun aktivitas penjelajahan Anda di luar chatbot IDMC.',
+  },
+  {
+    icon: HardDrive,
+    text: 'Riwayat obrolan tersimpan secara privat di peramban perangkat Anda dan dapat dihapus seutuhnya kapan saja.',
+  },
+  {
+    icon: Clock,
+    text: 'Sesi percakapan otomatis diputus jika tidak aktif selama 5 menit untuk menjaga privasi saat perangkat ditinggalkan.',
+  },
+  {
+    icon: Lock,
+    text: 'Layanan ini tidak memerlukan pendaftaran akun, kata sandi, maupun kredensial login portal IDMC.',
+  },
+  {
+    icon: BookOpen,
+    text: 'Seluruh jawaban bersumber langsung dari basis metadata dan indikator data terbuka Pemerintah Daerah DIY.',
+  },
+] as const
+
 function PrivacyModal({
   open,
   onClose,
@@ -75,13 +108,16 @@ function PrivacyModal({
     >
       <div className="web-privacy-modal">
         <div className="web-privacy-modal-header">
-          <div>
-            <h2 className="web-privacy-modal-title" id="privacy-modal-title">
-              Kebijakan Data & Privasi
-            </h2>
-            <p className="web-privacy-modal-subtitle">
-              Pemberitahuan pengelolaan data pada Chatbot Data Publik IDMC Pemda DIY
-            </p>
+          <div className="web-privacy-header-brand">
+            <img src={idmcIcon} alt="" className="web-privacy-header-logo" />
+            <div>
+              <h2 className="web-privacy-modal-title" id="privacy-modal-title">
+                IDMC Menjaga Privasi dan Keamanan Interaksi Anda
+              </h2>
+              <p className="web-privacy-modal-subtitle">
+                Komitmen keterbukaan dan pelindungan data pada Chatbot Data Publik Pemda DIY
+              </p>
+            </div>
           </div>
           <button
             type="button"
@@ -94,56 +130,33 @@ function PrivacyModal({
         </div>
 
         <div className="web-privacy-modal-body">
-          <div className="web-privacy-grid">
-            <div className="web-privacy-section">
-              <h3 className="web-privacy-section-heading">Data yang Diproses</h3>
-              <ul className="web-privacy-clean-list">
-                <li>
-                  <span className="web-privacy-item-title">Pertanyaan pencarian</span>
-                  <p>Teks pertanyaan diproses untuk mencocokkan topik dan data agregat statistik yang relevan dari dashboard Pemda DIY.</p>
-                </li>
-                <li>
-                  <span className="web-privacy-item-title">ID sesi sementara</span>
-                  <p>Token acak lokal untuk menjaga kesinambungan konteks tanya jawab selama jendela percakapan aktif.</p>
-                </li>
-                <li>
-                  <span className="web-privacy-item-title">Penyimpanan di peramban</span>
-                  <p>Riwayat percakapan tersimpan secara privat di peramban lokal (localStorage) perangkat Anda dan dapat dihapus sewaktu-waktu.</p>
-                </li>
-              </ul>
-            </div>
-
-            <div className="web-privacy-section">
-              <h3 className="web-privacy-section-heading">Data yang Tidak Dikumpulkan</h3>
-              <ul className="web-privacy-clean-list">
-                <li>
-                  <span className="web-privacy-item-title">Identitas pribadi (PII)</span>
-                  <p>Sistem tidak pernah meminta, mencatat, atau memproses NIK, nama lengkap, alamat tempat tinggal, atau kontak pribadi.</p>
-                </li>
-                <li>
-                  <span className="web-privacy-item-title">Kredensial & akun</span>
-                  <p>Tidak ada pencatatan kata sandi, token autentikasi, atau data rahasia akun pengguna.</p>
-                </li>
-                <li>
-                  <span className="web-privacy-item-title">Pelacakan lokasi & eksternal</span>
-                  <p>Tidak ada pelacakan koordinat GPS perangkat, alamat IP perorangan, maupun riwayat penjelajahan di luar aplikasi ini.</p>
-                </li>
-              </ul>
-            </div>
+          <div className="web-privacy-hero-card">
+            <ShieldCheck size={24} strokeWidth={1.75} className="web-privacy-card-icon" />
+            <p>
+              <strong>Chatbot tidak meminta, mencatat, atau menyimpan data identitas pribadi Anda</strong> seperti NIK, nama lengkap, alamat rumah, atau nomor telepon.
+            </p>
           </div>
 
-          <div className="web-privacy-footer-note">
-            Chatbot beroperasi pada basis pengetahuan agregat data terbuka Pemerintah Daerah DIY. Pengguna memegang kendali penuh atas data percakapan dan dapat membersihkan seluruh riwayat obrolan kapan saja melalui menu samping.
+          <div className="web-privacy-cards-grid">
+            {PRIVACY_COMMITMENTS.map(({ icon: Icon, text }, index) => (
+              <div key={index} className="web-privacy-item-card">
+                <Icon size={22} strokeWidth={1.75} className="web-privacy-card-icon" />
+                <p>{text}</p>
+              </div>
+            ))}
           </div>
         </div>
 
         <div className="web-privacy-modal-footer">
+          <span className="web-privacy-compliance">
+            Mengacu pada prinsip pelindungan data pribadi (UU No. 27 Tahun 2022)
+          </span>
           <button
             type="button"
             className="web-privacy-modal-dismiss"
             onClick={onClose}
           >
-            Tutup
+            Mengerti
           </button>
         </div>
       </div>

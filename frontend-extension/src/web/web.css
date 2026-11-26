@@ -456,7 +456,7 @@
   font: var(--idmc-type-b4);
   color: var(--idmc-color-neutral-600);
 }
-/* Minimalist Anti-Slop Privacy Modal */
+/* WhatsApp-style Privacy Commitment Modal (IDMC Palette) */
 .web-privacy-modal-backdrop {
   position: fixed;
   inset: 0;
@@ -469,10 +469,10 @@
 }
 .web-privacy-modal {
   background: #ffffff;
-  border-radius: 12px;
+  border-radius: 14px;
   border: 1px solid #eae5de;
-  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
-  max-width: 660px;
+  box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.16);
+  max-width: 680px;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
@@ -483,15 +483,28 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  padding: 24px 28px 16px;
-  border-bottom: 1px solid #eeebe5;
+  gap: 16px;
+  padding: 24px 28px 18px;
+  border-bottom: 1px solid #f0ece6;
+}
+.web-privacy-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.web-privacy-header-logo {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 .web-privacy-modal-title {
   margin: 0;
   font-size: 18px;
-  font-weight: 600;
-  color: #1a1a1a;
-  letter-spacing: -0.01em;
+  font-weight: 700;
+  color: var(--idmc-color-primary-500, #8b0000);
+  letter-spacing: -0.015em;
+  line-height: 1.3;
 }
 .web-privacy-modal-subtitle {
   font-size: 13px;
@@ -510,94 +523,95 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 .web-privacy-modal-close:hover {
   background: #f3f0ea;
   color: #111827;
 }
 .web-privacy-modal-body {
-  padding: 24px 28px;
+  padding: 22px 28px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 14px;
 }
-.web-privacy-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+.web-privacy-hero-card {
+  display: flex;
+  align-items: center;
   gap: 16px;
+  background: #faf6f2;
+  border: 1px solid #eadfd6;
+  border-radius: 10px;
+  padding: 16px 20px;
 }
-@media (max-width: 640px) {
-  .web-privacy-grid {
-    grid-template-columns: 1fr;
-  }
-}
-.web-privacy-section {
-  background: #faf9f6;
-  border: 1px solid #eae5de;
-  border-radius: 8px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.web-privacy-section-heading {
+.web-privacy-hero-card p {
   margin: 0;
-  font-size: 12px;
-  font-weight: 600;
-  color: #4b5563;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #eae5de;
-}
-.web-privacy-clean-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.web-privacy-clean-list li {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.web-privacy-item-title {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 13.5px;
+  line-height: 1.5;
   color: #1f2937;
 }
-.web-privacy-clean-list p {
-  margin: 0;
-  font-size: 12.5px;
-  line-height: 1.5;
-  color: #4b5563;
+.web-privacy-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
-.web-privacy-footer-note {
-  font-size: 12.5px;
-  line-height: 1.55;
-  color: #6b7280;
-  padding: 12px 14px;
-  background: #f8f6f2;
-  border-radius: 6px;
-  border: 1px solid #e8e3dc;
+@media (max-width: 640px) {
+  .web-privacy-cards-grid {
+    grid-template-columns: 1fr;
+  }
+  .web-privacy-modal-header,
+  .web-privacy-modal-body,
+  .web-privacy-modal-footer {
+    padding-inline: 20px;
+  }
+}
+.web-privacy-item-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: #faf9f6;
+  border: 1px solid #ebe6de;
+  border-radius: 10px;
+  padding: 15px 16px;
+  transition: border-color 150ms ease;
+}
+.web-privacy-item-card:hover {
+  border-color: #dcd4c8;
+}
+.web-privacy-card-icon {
+  color: var(--idmc-color-primary-500, #8b0000);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.web-privacy-item-card p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.48;
+  color: #374151;
 }
 .web-privacy-modal-footer {
   padding: 16px 28px;
-  border-top: 1px solid #eeebe5;
+  border-top: 1px solid #f0ece6;
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.web-privacy-compliance {
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.4;
 }
 .web-privacy-modal-dismiss {
-  padding: 8px 20px;
+  padding: 8px 22px;
   border-radius: 6px;
-  background: #8b0000;
+  background: var(--idmc-color-primary-500, #8b0000);
   color: #ffffff;
   border: 0;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
+  flex-shrink: 0;
   transition: background 150ms ease;
 }
 .web-privacy-modal-dismiss:hover {

@@ -187,6 +187,7 @@ class GeminiBackend:
     """
 
     kind = "gemini"
+    supports_tool_choice = True
 
     def __init__(self, model: str, api_key: str = "") -> None:
         if not api_key:
@@ -198,13 +199,21 @@ class GeminiBackend:
         self.model = model
 
     def generate(
-        self, messages: list[dict[str, Any]], tools: list[dict[str, Any]] | None = None
+        self,
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]] | None = None,
+        tool_choice_mode: str | None = None,
     ) -> BackendTurn:
         from ..core.errors import translate_provider_error
         from google.genai import errors, types
 
         system = next((m.get("text", "") for m in messages if m.get("role") == "system"), "")
         contents = [_message_to_content(m) for m in messages if m.get("role") != "system"]
+        tool_config = None
+        if tools and tool_choice_mode:
+            tool_config = types.ToolConfig(
+                function_calling_config=types.FunctionCallingConfig(mode=tool_choice_mode)
+            )
         try:
             resp = self._client.models.generate_content(
                 model=self._model,
@@ -212,6 +221,8 @@ class GeminiBackend:
                 config=types.GenerateContentConfig(
                     system_instruction=system or None,
                     tools=openai_tools_to_gemini(tools) if tools else None,
+                    tool_config=tool_config,
+                    temperature=0.0,
                 ),
             )
         except (errors.ServerError, errors.ClientError) as e:
@@ -287,6 +298,7 @@ class OpenAICompatBackend:
     """
 
     kind = "openai-compat"
+    supports_tool_choice = True
 
     def __init__(
         self,
@@ -310,15 +322,21 @@ class OpenAICompatBackend:
         return self._model
 
     def generate(
-        self, messages: list[dict[str, Any]], tools: list[dict[str, Any]] | None = None
+        self,
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]] | None = None,
+        tool_choice_mode: str | None = None,
     ) -> BackendTurn:
         payload: dict[str, Any] = {
             "model": self._model,
             "messages": _messages_to_openai(messages),
             "stream": True,
+            "temperature": 0.0,
         }
         if tools:
             payload["tools"] = tools
+            if tool_choice_mode == "ANY":
+                payload["tool_choice"] = "required"
         if self._reasoning_effort:
             payload["extra_body"] = {"reasoning": {"effort": self._reasoning_effort}}
         try:

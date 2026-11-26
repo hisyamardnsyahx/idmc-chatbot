@@ -115,6 +115,33 @@ def test_cors_preflight_allows_vite_dev_origin(tmp_path, monkeypatch):
     assert response.headers["access-control-allow-origin"] == "http://localhost:5173"
 
 
+def test_cors_preflight_allows_chrome_extension_and_portal_pna(tmp_path, monkeypatch):
+    c = _client(tmp_path, monkeypatch)
+    r_ext = c.options(
+        "/api/chat",
+        headers={
+            "Origin": "chrome-extension://abcdefghijklmnopqrstuvwxyz",
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "content-type",
+        },
+    )
+    assert r_ext.status_code == 200
+    assert r_ext.headers["access-control-allow-origin"] == "chrome-extension://abcdefghijklmnopqrstuvwxyz"
+
+    r_portal = c.options(
+        "/api/chat",
+        headers={
+            "Origin": "https://idmc.jogjaprov.go.id",
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Private-Network": "true",
+            "Access-Control-Request-Headers": "content-type",
+        },
+    )
+    assert r_portal.status_code == 200
+    assert r_portal.headers["access-control-allow-origin"] == "https://idmc.jogjaprov.go.id"
+    assert r_portal.headers["access-control-allow-private-network"] == "true"
+
+
 def test_charts_endpoint_returns_v2_catalog(tmp_path, monkeypatch):
     c = _client(tmp_path, monkeypatch)
     monkeypatch.setattr(

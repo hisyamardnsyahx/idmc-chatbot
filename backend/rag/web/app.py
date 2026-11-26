@@ -40,15 +40,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 app = FastAPI(title="RAG Web Chatbot")
 
-# The Vite dev server proxies /api, but a separately hosted frontend needs CORS.
-if config_mod.settings.cors_origins:
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=list(config_mod.settings.cors_origins),
-        allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
-        allow_headers=["Content-Type"],
-        max_age=600,
-    )
+# The Vite dev server proxies /api, but a separately hosted frontend and extension need CORS.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=list(config_mod.settings.cors_origins) if config_mod.settings.cors_origins else ["*"],
+    allow_origin_regex=r"^(chrome-extension://.*|https://idmc\.jogjaprov\.go\.id|http://localhost(:\d+)?|http://127\.0\.0\.1(:\d+)?)$",
+    allow_methods=["GET", "POST", "DELETE", "OPTIONS", "PATCH"],
+    allow_headers=["*"],
+    allow_private_network=True,
+    max_age=600,
+)
 
 if (BASE_DIR / "static").exists():
     app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")

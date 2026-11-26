@@ -8,6 +8,6 @@ export default defineBackground(() => {
   browser.runtime.onConnect.addListener(port => {
     if (port.name !== CHAT_PORT_NAME) return
     if (!isPortalSender(port.sender, browser.runtime.id)) { port.disconnect(); return }
-    handleChatPort(port, import.meta.env.WXT_CHAT_API_URL?.trim() ?? '')
+    handleChatPort(port, import.meta.env.WXT_CHAT_API_URL?.trim() || 'http://127.0.0.1:8001/api/chat')
   })
 })

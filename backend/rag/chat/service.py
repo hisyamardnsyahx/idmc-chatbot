@@ -304,6 +304,9 @@ def _generate_with_retry(
                 raise
             except ModelBusyError as e:
                 last_err = e
+                if attempt < attempts:
+                    time.sleep(0.5 * attempt)
+                    continue
                 log.warning("Chat backend %s overloaded; trying next.", model_name)
                 break
             except (ConfigurationError, UpstreamUnreachableError):

@@ -37,10 +37,10 @@ class Settings:
     """All tunable behaviour in one validated place."""
 
     gemini_api_key: str = ""
-    gemini_model: str = "gemini-3.8-flash"
+    gemini_model: str = "gemini-flash-lite-latest"
     gemini_fallback_models: tuple = (
+        "gemini-3.5-flash-lite",
         "gemini-3.6-flash",
-        "gemini-3.5-flash",
     )
     chat_provider: str = "gemini"
     chat_model: str = ""
@@ -54,6 +54,7 @@ class Settings:
         "http://127.0.0.1:5173",
         "http://localhost:4173",
         "http://127.0.0.1:4173",
+        "https://idmc.jogjaprov.go.id",
     )
     embed_model: str = "gemini-embedding-2"
     collection_name: str = "rag_web_gemini-embedding-2"

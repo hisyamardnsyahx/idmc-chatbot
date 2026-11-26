@@ -11,7 +11,11 @@ export default defineConfig({
     name: 'IDMC Chatbot',
     description: 'Chatbot Data Publik untuk portal IDMC Daerah Istimewa Yogyakarta.',
     minimum_chrome_version: '120',
-    host_permissions: chatHostPermissions(parseChatEndpoint(import.meta.env.WXT_CHAT_API_URL, true)),
+    host_permissions: Array.from(new Set([
+      ...chatHostPermissions(parseChatEndpoint(import.meta.env.WXT_CHAT_API_URL, true)),
+      'http://127.0.0.1/*',
+      'http://localhost/*',
+    ])),
   }),
   vite: () => ({ plugins: [tailwindcss()] }),
   webExt: { startUrls: ['https://idmc.jogjaprov.go.id/'] },

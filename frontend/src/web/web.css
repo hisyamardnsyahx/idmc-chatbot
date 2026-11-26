@@ -331,8 +331,7 @@
   overflow-y: auto;
   overflow-x: hidden;
   width: 100%;
-  display: flex;
-  flex-direction: column;
+  display: block;
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.22) transparent;
 }
@@ -353,7 +352,6 @@
   width: min(100%, 840px);
   margin-inline: auto;
   padding: 0 32px 24px;
-  flex: 1;
   display: flex;
   flex-direction: column;
 }
@@ -442,8 +440,10 @@
   border-radius: 0;
   padding: 24px 0;
   gap: 24px;
-  overflow-y: visible;
+  overflow: visible;
+  overscroll-behavior: auto;
   height: auto;
+  min-block-size: auto;
   flex: none;
 }
 .idmc-message__bubble {

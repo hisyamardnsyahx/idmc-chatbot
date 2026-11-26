@@ -61,7 +61,7 @@ export function MarkdownContent({ text, onSendPrompt }: MarkdownContentProps) {
           className={cn(
             'idmc-markdown__table',
             '[max-inline-size:100%] [margin-block:var(--idmc-space-3)] overflow-x-auto',
-            '[overscroll-behavior-inline:contain]',
+            '[overscroll-behavior-inline:contain] [overscroll-behavior-y:auto]',
           )}
           role="region"
           aria-label="Tabel jawaban"

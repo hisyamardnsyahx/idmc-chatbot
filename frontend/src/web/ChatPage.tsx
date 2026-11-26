@@ -455,6 +455,7 @@ function Conversation({
                 messages={messages}
                 isAssistantLoading={isAssistantLoading}
                 onSendPrompt={handleSendMessage}
+                containedScroll={false}
               />
             </div>
           </div>

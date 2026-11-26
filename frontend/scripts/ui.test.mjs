@@ -273,6 +273,9 @@ test('empty, loading and request-error states remain distinguishable', () => {
   const error = render('MessageList', { messages: [{ id: 'error', role: 'assistant', text: 'Gagal', status: 'error' }] })
   assert.match(error, /role="alert"/)
   assert.match(error, /data-status="error"/)
+  const webUncontained = render('MessageList', { messages: [], containedScroll: false })
+  assert.doesNotMatch(webUncontained, /overflow-y-auto/)
+  assert.doesNotMatch(webUncontained, /overscroll-behavior:contain/)
 })
 
 test('history selection and empty history keep their existing semantics', () => {

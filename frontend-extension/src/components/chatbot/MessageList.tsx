@@ -14,6 +14,11 @@ export interface MessageListProps {
   isAssistantLoading?: boolean
   /** Optional handler when a prompt hyperlink is clicked in markdown */
   onSendPrompt?: (prompt: string) => void
+  /**
+   * Controls whether the list itself acts as an isolated scroll container (used in extension overlay).
+   * Set to false in full-page web mode so scrolling belongs strictly to the outer full-width pane.
+   */
+  containedScroll?: boolean
 }
 
 export function MessageList({
@@ -21,24 +26,27 @@ export function MessageList({
   label = 'Percakapan',
   isAssistantLoading = false,
   onSendPrompt,
+  containedScroll = true,
 }: MessageListProps) {
   const listRef = useRef<HTMLUListElement>(null)
 
-  // Keep the newest message (or the typing indicator) in view.
+  // Keep the newest message (or the typing indicator) in view for contained extension lists.
   useEffect(() => {
+    if (!containedScroll) return
     const list = listRef.current
     if (list) list.scrollTop = list.scrollHeight
-  }, [messages, isAssistantLoading])
+  }, [messages, isAssistantLoading, containedScroll])
 
   return (
     <ul
       ref={listRef}
       className={cn(
         'idmc-message-list',
-        'flex [flex:1_1_0] flex-col items-stretch [gap:10px] [inline-size:100%] [min-block-size:0]',
-        '[min-inline-size:0] [margin:0] [padding:var(--idmc-space-4)_var(--idmc-space-3)] overflow-x-hidden',
-        'overflow-y-auto [overscroll-behavior:contain] [background:var(--idmc-color-neutral-100)]',
-        '[border-radius:var(--idmc-radius-4)] list-none [scrollbar-width:thin]',
+        'flex flex-col items-stretch [gap:10px] [inline-size:100%]',
+        '[min-inline-size:0] [margin:0] [padding:var(--idmc-space-4)_var(--idmc-space-3)]',
+        '[background:var(--idmc-color-neutral-100)] [border-radius:var(--idmc-radius-4)] list-none',
+        containedScroll &&
+          '[flex:1_1_0] [min-block-size:0] overflow-x-hidden overflow-y-auto [overscroll-behavior:contain] [scrollbar-width:thin]',
       )}
       role="log"
       aria-live="polite"

@@ -137,7 +137,7 @@ test('invalid handoff and unavailable API show feedback', async (t) => {
   )
 })
 
-test('switching during a request records cancellation and keeps other chats independent', async (t) => {
+test('switching during a request preserves in-flight response across conversation switch', async (t) => {
   const { page, context } = await open(t)
   await context.route('**/api/chat', async (route) => {
     await new Promise((resolve) => setTimeout(resolve, 800))
@@ -157,12 +157,11 @@ test('switching during a request records cancellation and keeps other chats inde
     .getByRole('button', { name: 'Pertanyaan lama', exact: true })
     .click()
   await page
-    .getByRole('alert')
-    .filter({ hasText: 'Jawaban dihentikan' })
+    .getByText('Balasan terlambat')
     .waitFor()
   assert.equal(
-    await page.getByText('Balasan terlambat', { exact: true }).count(),
-    0,
+    await page.getByText('Balasan terlambat').count(),
+    1,
   )
 })
 

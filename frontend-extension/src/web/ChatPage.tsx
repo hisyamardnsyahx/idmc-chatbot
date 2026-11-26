@@ -33,13 +33,12 @@ import { HeroTitle } from '../components/chatbot/HeroTitle'
 import { MessageList } from '../components/chatbot/MessageList'
 import { SuggestionList } from '../components/chatbot/SuggestionList'
 import { widgetClasses } from '../components/chatbot/layout'
-import { useChatSession } from '../components/chatbot/useChatSession'
 import {
   conversationTitle,
   newSessionWithWelcome,
 } from '../components/chatbot/conversation'
 import type { SavedConversation } from '../components/chatbot/conversation'
-import type { ChatMessage } from '../components/chatbot/types'
+import type { ChatMessage, MessageRole } from '../components/chatbot/types'
 import {
   INACTIVITY_INSIGHT_MS,
   SESSION_TIMEOUT_MS,
@@ -56,6 +55,8 @@ import {
   readConversations,
 } from './conversationStorage'
 import { clearAllSessions, deleteSession, getSession, listSessions, renameSession } from '../api/sessionsApi'
+import { sendChatMessage } from '../api/chatApi'
+import { ChatServiceUnavailableError } from '../api/chatTransport'
 
 const suggestions = [
   'Berapa jumlah sentra industri kecil dan menengah (IKM) di DIY?',
@@ -221,24 +222,26 @@ function ConfirmClearModal({
   )
 }
 
-function Conversation({
-  conversation,
-  onSave,
-  onResetSession,
-  onOpenPrivacy,
-}: {
+interface ConversationProps {
   conversation: SavedConversation
-  onSave: (conversation: SavedConversation) => void
+  isAssistantLoading: boolean
+  onSendMessage: (text: string) => void
+  onAppendMessage: (role: MessageRole, text: string) => void
   onResetSession?: () => void
   onOpenPrivacy?: () => void
-}) {
-  const { messages, isAssistantLoading, sendMessage, appendMessage } = useChatSession(
-    undefined,
-    conversation.messages,
-    conversation.id,
-  )
+}
+
+function Conversation({
+  conversation,
+  isAssistantLoading,
+  onSendMessage,
+  onAppendMessage,
+  onResetSession,
+  onOpenPrivacy,
+}: ConversationProps) {
+  const messages = conversation.messages
   const initialExpired = (() => {
-    const last = conversation.messages[conversation.messages.length - 1]
+    const last = messages[messages.length - 1]
     return Boolean(last && last.role === 'assistant' && last.text === SESSION_EXPIRED_MESSAGE)
   })()
   const [isSessionExpired, setIsSessionExpired] = useState(initialExpired)
@@ -269,9 +272,9 @@ function Conversation({
       setIsSessionExpired(false)
       lastInsightTimeRef.current = 0
       warningSentRef.current = false
-      void sendMessage(text)
+      onSendMessage(text)
     },
-    [recordActivity, sendMessage],
+    [recordActivity, onSendMessage],
   )
 
   const INSIGHT_STORAGE_KEY = 'idmc_last_insight_idx'
@@ -352,7 +355,7 @@ function Conversation({
       if (idleMs >= timeoutMs) {
         isSessionExpiredRef.current = true
         setIsSessionExpired(true)
-        appendMessage('assistant', SESSION_EXPIRED_MESSAGE)
+        onAppendMessage('assistant', SESSION_EXPIRED_MESSAGE)
         console.warn(
           `[IDMC Chatbot Web] Sesi diputus otomatis setelah ${idleSec}s tidak aktif (Batas: ${Math.floor(timeoutMs / 1000)}s).`,
         )
@@ -365,7 +368,7 @@ function Conversation({
         if (lastInsightTimeRef.current === 0) {
           lastInsightTimeRef.current = now
         }
-        appendMessage(
+        onAppendMessage(
           'assistant',
           '**Peringatan Tidak Aktif**\n\n' +
           'Sesi percakapan Anda tidak aktif selama 4 menit. Jika tidak ada aktivitas atau pertanyaan baru, sesi akan diputus otomatis dalam 1 menit.',
@@ -380,7 +383,7 @@ function Conversation({
       if (idleMs >= insightMs && lastInsightTimeRef.current === 0) {
         lastInsightTimeRef.current = now
         const insight = getNextInsight()
-        appendMessage('assistant', formatInsightMessage(insight))
+        onAppendMessage('assistant', formatInsightMessage(insight))
         console.info(
           `[IDMC Chatbot Web] Informasi menarik ditampilkan setelah ${idleSec}s tidak aktif: "${insight.title}".`,
         )
@@ -403,12 +406,12 @@ function Conversation({
 
       if (data.type === 'IDMC_TRIGGER_INSIGHT') {
         const insight = getNextInsight()
-        appendMessage('assistant', formatInsightMessage(insight))
+        onAppendMessage('assistant', formatInsightMessage(insight))
         console.info('[IDMC Chatbot Web] Manual Trigger: Wawasan dataset berhasil dimunculkan.')
       } else if (data.type === 'IDMC_TRIGGER_TIMEOUT') {
         isSessionExpiredRef.current = true
         setIsSessionExpired(true)
-        appendMessage('assistant', SESSION_EXPIRED_MESSAGE)
+        onAppendMessage('assistant', SESSION_EXPIRED_MESSAGE)
         console.warn('[IDMC Chatbot Web] Manual Trigger: Sesi diputus berhasil dimunculkan.')
       } else if (data.type === 'IDMC_SET_FAST_TIMERS') {
         customInsightMsRef.current = 5_000
@@ -446,38 +449,7 @@ function Conversation({
       window.removeEventListener('keydown', handleUserActivity)
       window.removeEventListener('pointerdown', handleUserActivity)
     }
-  }, [appendMessage, getInactivityInsightMs, getNextInsight, getSessionTimeoutMs, handleSendMessage, isAssistantLoading, recordActivity])
-
-  const latest = useRef({ messages, isAssistantLoading })
-  useEffect(() => {
-    latest.current = { messages, isAssistantLoading }
-  }, [messages, isAssistantLoading])
-  useEffect(
-    () => () => {
-      if (latest.current.isAssistantLoading) {
-        onSave({
-          id: conversation.id,
-          updatedAt: Date.now(),
-          messages: [
-            ...latest.current.messages,
-            {
-              id: crypto.randomUUID(),
-              role: 'assistant',
-              status: 'error',
-              text: 'Jawaban dihentikan saat berpindah percakapan. Kirim ulang pertanyaan untuk mencoba lagi.',
-            },
-          ],
-        })
-      }
-    },
-    [conversation.id, onSave],
-  )
-  useEffect(() => {
-    const hasUserMessage = messages.some((m) => m.role === 'user')
-    if (hasUserMessage || (conversation.title && messages.length > 0)) {
-      onSave({ id: conversation.id, messages, updatedAt: Date.now(), title: conversation.title })
-    }
-  }, [messages, conversation.id, conversation.title, onSave])
+  }, [getInactivityInsightMs, getNextInsight, getSessionTimeoutMs, handleSendMessage, isAssistantLoading, onAppendMessage, recordActivity])
 
   // Automatically scroll to bottom on new messages or loading states
   useEffect(() => {
@@ -591,6 +563,13 @@ function Conversation({
 function ChatWorkspace() {
   const [initial] = useState(initialConversation)
   const [active, setActive] = useState(initial.conversation)
+  const [loadingMap, setLoadingMap] = useState<Record<string, boolean>>({})
+  const controllersRef = useRef<Map<string, AbortController>>(new Map())
+  const activeRef = useRef(active)
+  useEffect(() => {
+    activeRef.current = active
+  }, [active])
+
   const [showPrivacyModal, setShowPrivacyModal] = useState(false)
   const [showClearModal, setShowClearModal] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -676,6 +655,180 @@ function ChatWorkspace() {
     }
   }, [])
 
+  const handleSendMessage = useCallback(
+    (text: string) => {
+      const trimmed = text.trim()
+      if (!trimmed) return
+      const currentActive = activeRef.current
+      const convId = currentActive.id
+      if (loadingMap[convId]) return
+
+      const userMsg: ChatMessage = {
+        id:
+          typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+            ? crypto.randomUUID()
+            : `m_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+        role: 'user',
+        text: trimmed,
+      }
+
+      const existingMsgs = currentActive.messages
+      const hasUserMsg = existingMsgs.some((m) => m.role === 'user')
+      const newTitle =
+        !hasUserMsg && !currentActive.title
+          ? trimmed.slice(0, 36) + (trimmed.length > 36 ? '...' : '')
+          : currentActive.title
+
+      const updatedMessagesWithUser = [...existingMsgs, userMsg]
+      const now = Date.now()
+
+      const updatedConversation: SavedConversation = {
+        id: convId,
+        messages: updatedMessagesWithUser,
+        updatedAt: now,
+        title: newTitle,
+      }
+
+      save(updatedConversation)
+      if (activeRef.current.id === convId) {
+        setActive(updatedConversation)
+      }
+
+      setLoadingMap((prev) => ({ ...prev, [convId]: true }))
+
+      const controller = new AbortController()
+      controllersRef.current.set(convId, controller)
+
+      sendChatMessage(trimmed, {
+        sessionId: convId,
+        signal: controller.signal,
+      })
+        .then((reply) => {
+          if (deletedIds.current.has(convId)) return
+
+          const assistantMsg: ChatMessage = {
+            id:
+              typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+                ? crypto.randomUUID()
+                : `m_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+            role: 'assistant',
+            text: reply.reply,
+            sources: reply.sources && reply.sources.length > 0 ? reply.sources : undefined,
+          }
+
+          setRecords((prev) => {
+            const existing = prev.find((r) => r.id === convId)
+            const msgs = existing
+              ? [...existing.messages, assistantMsg]
+              : [...updatedMessagesWithUser, assistantMsg]
+            const updated: SavedConversation = {
+              id: convId,
+              messages: msgs,
+              updatedAt: Date.now(),
+              title: existing?.title ?? newTitle,
+            }
+            try {
+              localStorage.setItem(CONVERSATION_PREFIX + convId, JSON.stringify(updated))
+            } catch {}
+            return [updated, ...prev.filter((r) => r.id !== convId)]
+          })
+
+          setActive((current) => {
+            if (current.id === convId) {
+              return {
+                ...current,
+                messages: [...current.messages, assistantMsg],
+                updatedAt: Date.now(),
+              }
+            }
+            return current
+          })
+        })
+        .catch((error) => {
+          if (deletedIds.current.has(convId)) return
+          if (error instanceof Error && error.name === 'AbortError') return
+
+          const isUnavailable =
+            (typeof ChatServiceUnavailableError !== 'undefined' &&
+              error instanceof ChatServiceUnavailableError) ||
+            (error as any)?.code === 'SERVICE_UNAVAILABLE' ||
+            (error as any)?.status === 503
+
+          const errorMsg: ChatMessage = {
+            id:
+              typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+                ? crypto.randomUUID()
+                : `m_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+            role: 'assistant',
+            status: 'error',
+            text: isUnavailable
+              ? 'Layanan chatbot belum tersedia. Silakan coba lagi nanti.'
+              : 'Maaf, terjadi kesalahan saat menghubungi server. Silakan coba lagi.',
+          }
+
+          setRecords((prev) => {
+            const existing = prev.find((r) => r.id === convId)
+            const msgs = existing
+              ? [...existing.messages, errorMsg]
+              : [...updatedMessagesWithUser, errorMsg]
+            const updated: SavedConversation = {
+              id: convId,
+              messages: msgs,
+              updatedAt: Date.now(),
+              title: existing?.title ?? newTitle,
+            }
+            try {
+              localStorage.setItem(CONVERSATION_PREFIX + convId, JSON.stringify(updated))
+            } catch {}
+            return [updated, ...prev.filter((r) => r.id !== convId)]
+          })
+
+          setActive((current) => {
+            if (current.id === convId) {
+              return {
+                ...current,
+                messages: [...current.messages, errorMsg],
+                updatedAt: Date.now(),
+              }
+            }
+            return current
+          })
+        })
+        .finally(() => {
+          controllersRef.current.delete(convId)
+          setLoadingMap((prev) => {
+            const copy = { ...prev }
+            delete copy[convId]
+            return copy
+          })
+        })
+    },
+    [loadingMap, save],
+  )
+
+  const handleAppendMessage = useCallback(
+    (role: MessageRole, text: string) => {
+      const currentActive = activeRef.current
+      const newMsg: ChatMessage = {
+        id:
+          typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+            ? crypto.randomUUID()
+            : `m_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+        role,
+        text,
+      }
+      const updatedMessages = [...currentActive.messages, newMsg]
+      const updatedConv: SavedConversation = {
+        ...currentActive,
+        messages: updatedMessages,
+        updatedAt: Date.now(),
+      }
+      save(updatedConv)
+      setActive(updatedConv)
+    },
+    [save],
+  )
+
   const select = (conversation: SavedConversation) => {
     // Ignore selecting the current row so pending requests keep their lifecycle.
     if (conversation.id !== active.id) {
@@ -711,20 +864,28 @@ function ChatWorkspace() {
             setActive(conversation)
           })
       } else {
-        setActive(conversation)
+        const fresh = records.find((r) => r.id === conversation.id) ?? conversation
+        setActive(fresh)
       }
     }
     setOpenMobile(false)
   }
 
   const remove = (conversation: SavedConversation) => {
+    deletedIds.current.add(conversation.id)
+    controllersRef.current.get(conversation.id)?.abort()
+    controllersRef.current.delete(conversation.id)
+    setLoadingMap((prev) => {
+      const next = { ...prev }
+      delete next[conversation.id]
+      return next
+    })
     try {
       localStorage.removeItem(CONVERSATION_PREFIX + conversation.id)
     } catch {
       setNotice('Riwayat gagal dihapus dari penyimpanan browser.')
       return
     }
-    deletedIds.current.add(conversation.id)
     setRecords((previous) =>
       previous.filter((item) => item.id !== conversation.id),
     )
@@ -734,6 +895,13 @@ function ChatWorkspace() {
 
   const clearAll = async () => {
     setShowClearModal(false)
+    controllersRef.current.forEach((controller, id) => {
+      deletedIds.current.add(id)
+      controller.abort()
+    })
+    controllersRef.current.clear()
+    setLoadingMap({})
+
     try {
       const keysToRemove: string[] = []
       for (let i = 0; i < localStorage.length; i++) {
@@ -948,7 +1116,9 @@ function ChatWorkspace() {
         <Conversation
           key={active.id}
           conversation={active}
-          onSave={save}
+          isAssistantLoading={Boolean(loadingMap[active.id])}
+          onSendMessage={handleSendMessage}
+          onAppendMessage={handleAppendMessage}
           onResetSession={() => select(newSessionWithWelcome())}
           onOpenPrivacy={() => setShowPrivacyModal(true)}
         />

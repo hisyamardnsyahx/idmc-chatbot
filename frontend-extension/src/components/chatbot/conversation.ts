@@ -44,10 +44,27 @@ export function isConversation(value: unknown): value is SavedConversation {
   )
 }
 
+export const WELCOME_GREETING_MESSAGE =
+  'Selamat datang di **Chatbot Data Publik IDMC Pemda DIY**.\n\n' +
+  'Saya dapat membantu Anda menelusuri data dan informasi resmi dari dashboard Pemerintah Daerah DIY, seperti kepegawaian (SIMPEG), realisasi pembangunan, jaringan fiber optic, pemantauan CCTV, IKM, ketahanan pangan, dan lingkungan hidup.\n\n' +
+  'Silakan ketik pertanyaan Anda atau pilih salah satu topik rekomendasi di bawah untuk memulai.'
+
+export function createWelcomeMessage(): ChatMessage {
+  return {
+    id: crypto.randomUUID(),
+    role: 'assistant',
+    text: WELCOME_GREETING_MESSAGE,
+  }
+}
+
 export function newConversation(
   messages: ChatMessage[] = [],
 ): SavedConversation {
   return { id: crypto.randomUUID(), messages, updatedAt: Date.now() }
+}
+
+export function newSessionWithWelcome(): SavedConversation {
+  return newConversation([createWelcomeMessage()])
 }
 
 /** The fragment stays in the browser and is removed as soon as the web app loads. */

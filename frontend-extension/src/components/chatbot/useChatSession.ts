@@ -41,13 +41,13 @@ export function useChatSession(
     [],
   )
 
-  const resetConversation = useCallback(() => {
+  const resetConversation = useCallback((initialMsgs: ChatMessage[] = []) => {
     requestRef.current?.abort()
     requestRef.current = null
     setIsAssistantLoading(false)
     setIsHydrating(false)
     setSessionId(null)
-    setMessages([])
+    setMessages(initialMsgs)
     nextMessageId.current = 0
   }, [])
 
@@ -139,9 +139,9 @@ export function useChatSession(
     }
   }, [])
 
-  // Auto-save conversation to local storage so history works offline & in extension
+  // Auto-save conversation to local storage once user has engaged
   useEffect(() => {
-    if (messages.length === 0) return
+    if (!messages.some((m) => m.role === 'user')) return
     const sid = sessionId || 'sess_current'
     const firstUser = messages.find((m) => m.role === 'user')
     const title = firstUser

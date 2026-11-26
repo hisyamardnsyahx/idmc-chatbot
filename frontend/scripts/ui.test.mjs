@@ -420,4 +420,12 @@ test('inactivity thresholds match AWS Lex and OWASP benchmarks', async () => {
   assert.match(SESSION_EXPIRED_MESSAGE, /5 menit/)
   assert.match(SESSION_EXPIRED_MESSAGE, /Mulai Sesi Baru/)
   assert.doesNotMatch(SESSION_EXPIRED_MESSAGE, /⏱️/, 'No emoji in expiration message')
+
+  const { newSessionWithWelcome, WELCOME_GREETING_MESSAGE } =
+    await server.ssrLoadModule('/src/components/chatbot/conversation.ts')
+  const fresh = newSessionWithWelcome()
+  assert.equal(fresh.messages.length, 1)
+  assert.equal(fresh.messages[0].role, 'assistant')
+  assert.equal(fresh.messages[0].text, WELCOME_GREETING_MESSAGE)
+  assert.match(WELCOME_GREETING_MESSAGE, /Selamat datang/)
 })

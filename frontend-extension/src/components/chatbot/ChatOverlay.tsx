@@ -10,7 +10,7 @@ import { HomeView } from './HomeView'
 import type { ChatHistoryItem, ChatUser } from './types'
 import { useChatSession } from './useChatSession'
 import type { ChatTransport } from '../../api/chatTransport'
-import { expandedChatUrl } from './conversation'
+import { createWelcomeMessage, expandedChatUrl } from './conversation'
 import type { ConversationStore } from './conversation'
 import { DYNAMIC_INSIGHTS_POOL, formatInsightMessage } from './insights'
 import type { DynamicInsight } from './insights'
@@ -220,7 +220,7 @@ export function ChatOverlay({
       `Panduan Pengujian Cepat di Console:\n` +
       `  - Uji Wawasan Instan: window.postMessage({ type: 'IDMC_TRIGGER_INSIGHT' }, '*')\n` +
       `  - Uji Selesai Sesi Instan: window.postMessage({ type: 'IDMC_TRIGGER_TIMEOUT' }, '*')\n` +
-      `  - Mode Cepat (10s/25s): window.postMessage({ type: 'IDMC_SET_FAST_TIMERS' }, '*')`,
+      `  - Mode Cepat (5s/10s/15s): window.postMessage({ type: 'IDMC_SET_FAST_TIMERS' }, '*')`,
     )
 
     let lastLoggedSecond = 0
@@ -232,6 +232,7 @@ export function ChatOverlay({
 
       const now = Date.now()
       const idleMs = now - lastActivityTimeRef.current
+      const insightMs = getInactivityInsightMs()
       const timeoutMs = getSessionTimeoutMs()
       const warningMs =
         customWarningMsRef.current ??
@@ -242,11 +243,11 @@ export function ChatOverlay({
       if (idleSec > 0 && idleSec % 30 === 0 && idleSec !== lastLoggedSecond) {
         lastLoggedSecond = idleSec
         console.log(
-          `[IDMC Chatbot] Waktu idle: ${idleSec}s / ${Math.floor(timeoutMs / 1000)}s (Peringatan: ${Math.floor(warningMs / 1000)}s | Sesi Diputus: ${Math.floor(timeoutMs / 1000)}s)`,
+          `[IDMC Chatbot] Waktu idle: ${idleSec}s / ${Math.floor(timeoutMs / 1000)}s (Informasi: ${Math.floor(insightMs / 1000)}s | Peringatan: ${Math.floor(warningMs / 1000)}s | Sesi Diputus: ${Math.floor(timeoutMs / 1000)}s)`,
         )
       }
 
-      // Step 2: 5 minutes idle -> Graceful Session Expiration (Sesi Diputus)
+      // Step 3: 5 minutes idle -> Graceful Session Expiration (Sesi Diputus)
       if (idleMs >= timeoutMs) {
         isSessionExpiredRef.current = true
         setIsSessionExpired(true)
@@ -256,9 +257,12 @@ export function ChatOverlay({
         return
       }
 
-      // Step 1: 4 minutes idle -> 1-minute warning notice
+      // Step 2: 4 minutes idle -> 1-minute warning notice
       if (idleMs >= warningMs && !warningSentRef.current) {
         warningSentRef.current = true
+        if (lastInsightTimeRef.current === 0) {
+          lastInsightTimeRef.current = now
+        }
         appendMessage(
           'assistant',
           '**Peringatan Tidak Aktif**\n\n' +
@@ -266,6 +270,16 @@ export function ChatOverlay({
         )
         setView((current) => (current === 'home' ? 'chat' : current))
         console.info(`[IDMC Chatbot] Peringatan tidak aktif ditampilkan (${idleSec}s idle).`)
+        return
+      }
+
+      // Step 1: 2 minutes idle -> Proactive interesting dataset insight
+      if (idleMs >= insightMs && lastInsightTimeRef.current === 0) {
+        lastInsightTimeRef.current = now
+        const insight = getNextInsight()
+        appendMessage('assistant', formatInsightMessage(insight))
+        setView((current) => (current === 'home' ? 'chat' : current))
+        console.info(`[IDMC Chatbot] Informasi menarik ditampilkan setelah ${idleSec}s idle: "${insight.title}".`)
       }
     }
 
@@ -297,17 +311,21 @@ export function ChatOverlay({
         setView((current) => (current === 'home' ? 'chat' : current))
         console.warn('[IDMC Chatbot] Manual Trigger: Sesi expired berhasil dimunculkan.')
       } else if (data.type === 'IDMC_SET_FAST_TIMERS') {
+        customInsightMsRef.current = 5_000
         customWarningMsRef.current = 10_000
         customTimeoutMsRef.current = 15_000
         lastActivityTimeRef.current = Date.now()
+        lastInsightTimeRef.current = 0
         warningSentRef.current = false
-        console.info('[IDMC Chatbot] Mode Uji Cepat Aktif: Peringatan = 10s, Sesi Diputus = 15s.')
+        console.info('[IDMC Chatbot] Mode Uji Cepat Aktif: Informasi = 5s, Peringatan = 10s, Sesi Diputus = 15s.')
       } else if (data.type === 'IDMC_RESET_TIMERS') {
+        customInsightMsRef.current = null
         customWarningMsRef.current = null
         customTimeoutMsRef.current = null
         lastActivityTimeRef.current = Date.now()
+        lastInsightTimeRef.current = 0
         warningSentRef.current = false
-        console.info('[IDMC Chatbot] Timers kembali ke standar: Peringatan = 240s, Sesi Diputus = 300s (5 menit).')
+        console.info('[IDMC Chatbot] Timers kembali ke standar: Informasi = 120s, Peringatan = 240s, Sesi Diputus = 300s (5 menit).')
       } else if (data.type === 'IDMC_SEND_PROMPT' && typeof data.prompt === 'string') {
         recordActivity()
         setIsSessionExpired(false)
@@ -317,14 +335,15 @@ export function ChatOverlay({
     }
     window.addEventListener('message', handleMessage)
 
-    // User activity listener: keydown inside the panel (typing) resets idle timer
+    // User activity listener: keydown or pointerdown inside the panel resets idle timer
     const panel = panelRef.current
-    const handleKeyDown = () => {
+    const handlePanelActivity = () => {
       recordActivity()
     }
 
     if (panel) {
-      panel.addEventListener('keydown', handleKeyDown, { passive: true })
+      panel.addEventListener('keydown', handlePanelActivity, { passive: true })
+      panel.addEventListener('pointerdown', handlePanelActivity, { passive: true })
     }
 
     return () => {
@@ -333,10 +352,11 @@ export function ChatOverlay({
       window.removeEventListener('focus', handleVisibility)
       window.removeEventListener('message', handleMessage)
       if (panel) {
-        panel.removeEventListener('keydown', handleKeyDown)
+        panel.removeEventListener('keydown', handlePanelActivity)
+        panel.removeEventListener('pointerdown', handlePanelActivity)
       }
     }
-  }, [phase, isAssistantLoading, isHydrating, recordActivity, getNextInsight, appendMessage, getInactivityInsightMs, getSessionTimeoutMs])
+  }, [phase, isAssistantLoading, isHydrating, recordActivity, getNextInsight, appendMessage, getInactivityInsightMs, getSessionTimeoutMs, sendMessage])
 
   // Home submit or suggestion click: send the text and switch to Conversation.
   const startConversation = (text: string) => {
@@ -355,11 +375,12 @@ export function ChatOverlay({
   const handleStartFreshSession = useCallback(() => {
     lastActivityTimeRef.current = Date.now()
     lastInsightTimeRef.current = 0
+    warningSentRef.current = false
     isSessionExpiredRef.current = false
     setIsSessionExpired(false)
-    resetConversation()
+    resetConversation([createWelcomeMessage()])
     shownInsightIdsRef.current = []
-    setView('home')
+    setView('chat')
   }, [resetConversation])
 
   const openHistory = () => {
